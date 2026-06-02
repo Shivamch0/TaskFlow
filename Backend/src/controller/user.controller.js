@@ -15,7 +15,7 @@ const options = {
 
 const generateAccessAndRefreshToken = async (userId) => {
     try {
-        const user = await User.findById(userId).select(" -password -refreshToken ")
+        const user = await User.findById(userId)
         if(!user) throw new ApiError(400 , "User not found...");
 
         const accessToken = await user.generateAccessToken();
@@ -31,7 +31,9 @@ const generateAccessAndRefreshToken = async (userId) => {
 }
 
 const registerUser = asyncHandler (async (req , res) => {
+    console.log(req.body)
     const { userName , email , password} = req.body;
+    
     if(!userName || !email || !password){
         throw new ApiError(400 , "Fill all the fields...");
     }
@@ -49,7 +51,7 @@ const registerUser = asyncHandler (async (req , res) => {
 
     const { accessToken , refreshToken } = await generateAccessAndRefreshToken(user._id)
 
-    const createdUser = await user.findById(user._id).select(" -password -refreshToken ");
+    const createdUser = await User.findById(user._id).select(" -password -refreshToken ");
     if(!createdUser){
         throw new ApiError(400 , "Something went wrong while creating user...");
     }
