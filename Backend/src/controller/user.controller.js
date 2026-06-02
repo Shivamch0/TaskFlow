@@ -59,3 +59,30 @@ const registerUser = asyncHandler (async (req , res) => {
             .cookie("refreshToken" , refreshToken , options)
             .json(new ApiResponse(200 , {user : createdUser} , "User Created Successfullu..."))
 });
+
+const loginUser = asyncHandler( async (req , res) => {
+    const { email , password } = req.body;
+    if(!email || !password){
+        throw new ApiError(400 , "Fill all the fields...");
+    }
+
+    const user = await User.findOne({email});
+    if(!user){
+        throw new ApiError(400 , "User with this email not found...");
+    }
+
+    const checkPassword = await user.isPasswordCorrect(password)
+    if(!checkPassword){
+        throw new ApiError(400 , "Incorrect Password...");
+    }
+
+    const {accessToken , refreshToken} = await generateAccessAndRefreshToken(user._id);
+
+    const loggedInUser = await User.findById(user._id).select(" -password -refreshToken ");
+
+    return res.status(200)
+            .cookie("accessToken" , accessToken , options)
+            .cookie("refreshToken" , refreshToken , options)
+            .json(new ApiResponse(200 , {user : loggedInUser} , "User LoggedIn Successfullu..."))
+
+});
