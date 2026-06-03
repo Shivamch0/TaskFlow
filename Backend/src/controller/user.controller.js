@@ -8,7 +8,7 @@ import { ApiResponse } from "../utils/ApiResponse.js"
 const options = {
     httpOnly : true,
     secure : process.env.NODE_ENV === "production",
-    sameSite : 'Lax',
+    sameSite : 'Lax', // ! Have to change during deployment
     path : "/",
     maxAge : 7 * 24 * 60 * 60 * 1000
 }
@@ -31,7 +31,6 @@ const generateAccessAndRefreshToken = async (userId) => {
 }
 
 const registerUser = asyncHandler (async (req , res) => {
-    console.log(req.body)
     const { userName , email , password} = req.body;
     
     if(!userName || !email || !password){
