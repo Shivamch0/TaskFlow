@@ -20,6 +20,6 @@ import subTaskRouter from './routes/subTask.route.js';
 app.use("/api/v1/user" , userRouter);
 app.use("/api/v1/project" , projectRouter);
 app.use("/api/v1/task" , taskRouter);
-app.use("api/v1/subTask" , subTaskRouter);
+app.use("/api/v1/subTask" , subTaskRouter);
 
 export default app;
