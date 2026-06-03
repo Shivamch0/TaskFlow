@@ -51,7 +51,17 @@ const getTasks = asyncHandler(async (req , res) => {
 });
 
 const getTaskById = asyncHandler(async (req , res) => {
-    const { project } = await validateProject();
+    await validateProject();
+
+    const taskId = req.params;
+    if(!taskId){
+        throw new ApiError(404 , "Task Id not found...")
+    }
+
+    const fetchTaskById = await Task.findById(taskId);
+
+    return res.status(200).json(new ApiResponse(200 , {fetchTaskById} , "Task fetched by id successfully..."))
+
 });
 
 const updateTask = asyncHandler(async (req , res) => {});
