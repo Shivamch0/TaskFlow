@@ -54,7 +54,34 @@ const getProjectById = asyncHandler(async (req , res) => {
             .json(new ApiResponse(200 , project , "Fetched Project By Id Successfully..."))
 });
 
-const updateProject = asyncHandler(async (req , res) => {});
+const updateProject = asyncHandler(async (req , res) => {
+    const projectId = req.params.id;
+     if(!projectId){
+        throw new ApiError(404 , "Project Id not found...")
+    }
+    const user = req.user._id;
+    const { title , description} = req.body;
+
+    const project = await Project.findById(projectId);
+    if(!project){
+        throw new ApiError(400 , "Project not found...")
+    }
+    if(project.user.toString() !== user.toString()){
+        throw new ApiError(403 , "You are not authorized to update this project...")
+    }
+
+    const updatedProject = await Project.findByIdAndUpdate(  projectId , 
+        {
+            $set : {
+                ...(title && {title}),
+                ...(description && {description}),
+            }
+        },
+        {new : true}
+    )
+
+    return res.status(200).json(new ApiResponse(200 , updatedProject , "Project details update successfully..."))
+});
 
 const deleteProject = asyncHandler(async (req , res) => {});
 
