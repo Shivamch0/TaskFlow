@@ -34,7 +34,23 @@ const createTask = asyncHandler(async (req , res) => {
 
 });
 
-const getTasks = asyncHandler(async (req , res) => {});
+const getTasks = asyncHandler(async (req , res) => {
+    const projectId = req.params.id;
+    if(!projectId){
+        throw new ApiError(404 , "Project Id not found...")
+    }
+    const project = await Project.findById({projectId});
+    if(!project){
+        throw new ApiError(404 , "Project not found...")
+    }
+    const user = req.user._id;
+    if(project.id.toString() !== user.id.toString){
+        throw new ApiError(403 , "You are not authorized to get the tasks...")
+    }
+
+    const fetchTasks = await Task.find({project}).sort({createdAt : -1});
+    return res.status(200).json(new ApiResponse(200 , {fetchTasks} , "Tasks Fetched Successfully..."))
+});
 
 const getTaskById = asyncHandler(async (req , res) => {});
 
