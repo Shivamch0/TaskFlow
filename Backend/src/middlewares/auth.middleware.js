@@ -8,7 +8,7 @@ import { ApiError } from "../utils/ApiError.js"
 const verifyJWT = asyncHandler( async (req , res , next) => {
     try {
         // ! Needed Token that comes from cookies || header
-        const token = req.cookie?.accessToken || req.header("Authorization")?.replace("Bearer " , "");
+        const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer " , "");
         if(!token){
             throw new ApiError(401 , "Unauthorized request: Token missing...")
         }
