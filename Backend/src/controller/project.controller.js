@@ -18,12 +18,8 @@ const createProject = asyncHandler(async (req , res) => {
         description,
         user
     })
-    const createdProject = await Project.findById(project._id);
-    if(!createdProject){
-        throw new ApiError(400 , "Something went wrong while creating project...");
-    }
     return res.status(200)
-            .json(new ApiResponse(200 , createProject , "Project created successfully..."))
+            .json(new ApiResponse(200 , {project} , "Project created successfully..."))
 });
 
 const getProjects = asyncHandler(async (req , res) => {
