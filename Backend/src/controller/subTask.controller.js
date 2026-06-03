@@ -1,40 +1,148 @@
 import { SubTask } from "../model/subtask.model.js";
 
-import { validateTask } from '../helpers/task.helper.js';
-import { validateSubTask } from '../helpers/subTask.helper.js'
+import { validateTask } from "../helpers/task.helper.js";
+import { validateSubTask } from "../helpers/subTask.helper.js";
 
 // ? Utils Import
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
-const createSubTask = asyncHandler(async (req , res) => {
-    const { title } = req.body;
-    if(!title){
-        throw new ApiError(400 , "SubTask required...")
-    }
+const createSubTask = asyncHandler(async (req, res) => {
+  const { title } = req.body;
+  if (!title) {
+    throw new ApiError(400, "SubTask required...");
+  }
 
-    const taskId = req.params.id;
+  const task = await validateTask(req.params.id, req.user._id);
 
-    const task = await validateTask(taskId)
+  const subTask = await SubTask.create({
+    title,
+    task: task.id,
+  });
 
-    const subTask = await SubTask.create({
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { subTask }, "SubTask created successfully..."));
+});
+
+const getSubTasksByTask = asyncHandler(async (req, res) => {
+  if (!req.params.taskId) {
+    throw new ApiError(404, "Task Id not found...");
+  }
+  const task = await validateTask(req.params.taskId, req.user._id);
+
+  const fetchSubTasks = await SubTask.find({ task: task._id }).sort({
+    createdAt: -1,
+  });
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { fetchSubTasks },
+        "SubTasks fetched successfully...",
+      ),
+    );
+});
+
+const getSubTaskById = asyncHandler(async (req, res) => {
+  if (!req.params.subTaskId) {
+    throw new ApiError(404, "SubTask Id not found...");
+  }
+  const subTask = validateSubTask(req.params.subTaskId, req.user._id);
+
+  const fetchSubTaskById = await SubTask.findById(subTask._id);
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { fetchSubTaskById },
+        "SubTask fetched By Id successfully...",
+      ),
+    );
+});
+
+const updateSubTask = asyncHandler(async (req, res) => {
+  if (!req.params.subTaskId) {
+    throw new ApiError(404, "Task Id not found...");
+  }
+  const subTask = await validateSubTask(req.params.subTaskId, req.user._id);
+  const { title } = req.body;
+  if (!title) {
+    throw new ApiError(404, "Title is required for Updation...");
+  }
+
+  const updatedSubTask = await SubTask.findByIdAndUpdate(
+    subTask._id,
+    {
+      $set: {
         title,
-        task : task.id
-    })
+      },
+    },
+    {
+      new: true,
+    },
+  );
 
-    return res.status(200).json(new ApiResponse(200 , {subTask} , "SubTask created successfully..."))
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { updatedSubTask },
+        "SubTask updated successfully...",
+      ),
+    );
+});
 
-})
+const deleteSubTask = asyncHandler(async (req, res) => {
+  if (!req.params.subTaskId) {
+    throw new ApiError(404, "Task Id not found...");
+  }
+  const subTask = await validateSubTask(req.params.subTaskId, req.user._id);
 
-const getSubTasksByTask = asyncHandler(async (req , res) => {})
+  const deletedSubTask = await SubTask.findByIdAndDelete(subTask._id);
 
-const getSubTaskById = asyncHandler(async (req , res) => {})
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { deletedSubTask },
+        "SubTask deleted successfully...",
+      ),
+    );
+});
 
-const updateSubTask = asyncHandler(async (req , res) => {})
+const toggleSubTaskStatus = asyncHandler(async (req, res) => {
+  if (!req.params.subTaskId) {
+    throw new ApiError(404, "Task Id not found...");
+  }
+  const subTask = await validateSubTask(req.params.subTaskId, req.user._id);
 
-const deleteSubTask = asyncHandler(async (req , res) => {})
+  subTask.completed = !subTask.completed;
+  await subTask.save();
 
-const toggleSubTaskStatus = asyncHandler(async (req , res) => {})
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        subTask,
+        `Task marked as ${subTask.completed ? "completed" : "pending"}`,
+      ),
+    );
+});
 
-export { createSubTask , getSubTasksByTask , getSubTaskById , updateSubTask , deleteSubTask , toggleSubTaskStatus}
+export {
+  createSubTask,
+  getSubTasksByTask,
+  getSubTaskById,
+  updateSubTask,
+  deleteSubTask,
+  toggleSubTaskStatus,
+};
