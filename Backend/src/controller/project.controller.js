@@ -31,16 +31,13 @@ const getProjects = asyncHandler(async (req , res) => {
 });
 
 const getProjectById = asyncHandler(async (req , res) => {
-    console.log(req.params)
     const projectId = req.params.id;
-    console.log(projectId)
     if(!projectId){
         throw new ApiError(404 , "Project Id not found...")
     }
     const user = req.user._id;
     
     const project = await Project.findById(projectId);
-    console.log(project)
     if(!project){
         throw new ApiError(404 , "Project not found...")
     }
