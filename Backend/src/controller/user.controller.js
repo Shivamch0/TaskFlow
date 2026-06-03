@@ -22,20 +22,16 @@ const clearCookieOptions = {
 };
 
 const generateAccessAndRefreshToken = async (userId) => {
-  try {
-    const user = await User.findById(userId);
-    if (!user) throw new ApiError(400, "User not found...");
+  const user = await User.findById(userId);
+  if (!user) throw new ApiError(400, "User not found...");
 
-    const accessToken = await user.generateAccessToken();
-    const refreshToken = await user.generateRefreshToken();
+  const accessToken = user.generateAccessToken();
+  const refreshToken = user.generateRefreshToken();
 
-    user.refreshToken = refreshToken;
-    await user.save({ validateBeforeSave: false });
+  user.refreshToken = refreshToken;
+  await user.save({ validateBeforeSave: false });
 
-    return { accessToken, refreshToken };
-  } catch (error) {
-    console.log(" Access and Refresh Token Error ", error);
-  }
+  return { accessToken, refreshToken };
 };
 
 const registerUser = asyncHandler(async (req, res) => {
