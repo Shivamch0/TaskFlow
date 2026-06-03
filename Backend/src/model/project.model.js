@@ -2,7 +2,7 @@ import mongoose from "mongoose"
 
 const projectSchema = new mongoose.Schema({
     title : {
-        type : String
+        type : String,
     },
     description : {
         type : String

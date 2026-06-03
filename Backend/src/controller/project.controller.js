@@ -1,0 +1,44 @@
+import { Project } from "../model/project.model.js";
+
+// ? Utils Import
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+
+const createProject = asyncHandler(async (req , res) => {
+    const {title , description } = req.body;
+    const user = req.user._id
+
+    if(!title?.trim()){
+        throw new ApiError(400 , "Project title is required...");
+    }
+
+    const project = await Project.create({
+        title,
+        description,
+        user
+    })
+    const createdProject = await Project.findById(project._id);
+    if(!createdProject){
+        throw new ApiError(400 , "Something went wrong while creating project...");
+    }
+    return res.status(200)
+            .json(new ApiResponse(200 , createProject , "Project created successfully..."))
+});
+
+const getProjects = asyncHandler(async (req , res) => {
+    const user = req.user._id;
+    const projects = await Project.find({user}).sort({createdAt : -1});
+
+    return res.status(200)
+            .json(new ApiResponse(200 , projects , "Projects fetched successfully..."))
+});
+
+const getProjectById = asyncHandler(async (req , res) => {});
+
+const updateProject = asyncHandler(async (req , res) => {});
+
+const deleteProject = asyncHandler(async (req , res) => {});
+
+
+export { createProject , getProjects , getProjectById , updateProject , createProject }
