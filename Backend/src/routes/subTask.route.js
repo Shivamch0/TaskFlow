@@ -21,6 +21,6 @@ router.route("/:subTaskId")
   .patch(verifyJWT, updateSubTask)
   .delete(verifyJWT, deleteSubTask);
 
-router.route("/subTaskId/toogle-status").patch(verifyJWT , toggleSubTaskStatus)
+router.route("/:subTaskId/toogle-status").patch(verifyJWT , toggleSubTaskStatus)
 
 export default router;

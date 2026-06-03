@@ -11,10 +11,10 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 const createSubTask = asyncHandler(async (req, res) => {
   const { title } = req.body;
   if (!title) {
-    throw new ApiError(400, "SubTask required...");
+    throw new ApiError(400, "SubTasktitle is required...");
   }
 
-  const task = await validateTask(req.params.id, req.user._id);
+  const task = await validateTask(req.params.taskId, req.user._id);
 
   const subTask = await SubTask.create({
     title,
@@ -51,16 +51,14 @@ const getSubTaskById = asyncHandler(async (req, res) => {
   if (!req.params.subTaskId) {
     throw new ApiError(404, "SubTask Id not found...");
   }
-  const subTask = validateSubTask(req.params.subTaskId, req.user._id);
-
-  const fetchSubTaskById = await SubTask.findById(subTask._id);
+  const subTask = await validateSubTask(req.params.subTaskId, req.user._id);
 
   return res
     .status(200)
     .json(
       new ApiResponse(
         200,
-        { fetchSubTaskById },
+        { subTask },
         "SubTask fetched By Id successfully...",
       ),
     );
