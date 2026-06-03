@@ -1,7 +1,7 @@
 import { SubTask } from "../model/subtask.model.js";
 import { ApiError } from "../utils/ApiError.js";
 
-export const validateSubTask = async (subTaskId , userId) => {
+export const validateSubTask = async (subTaskId) => {
     if(!subTaskId){
         throw new ApiError(404, "SubTask Id not found...");
     }
