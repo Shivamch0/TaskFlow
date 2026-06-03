@@ -6,7 +6,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
-const validateProject = async (req , res) => {
+const validateProject = async (req ) => {
     try {
     const projectId = req.params.id;
     if(!projectId){
@@ -17,7 +17,7 @@ const validateProject = async (req , res) => {
         throw new ApiError(404 , "Project not found...")
     }
     const user = req.user._id;
-    if(project.user.toString() !== user.id.toString){
+    if(project.user.toString() !== user.toString){
         throw new ApiError(403 , "You are not authorized to add task in this project...")
     }
 
@@ -27,12 +27,13 @@ const validateProject = async (req , res) => {
     }
 }
 
-const createTask = asyncHandler(async (req ) => {
-    const { project } = await validateProject();
+const createTask = asyncHandler(async (req , res) => {
     const { title } = req.body;
     if(!title){
         throw new ApiError(400 , "Task cannot be empty...")
     }
+
+    const { project } = await validateProject(req);
 
     const task = await Task.create({
         title,
@@ -44,19 +45,19 @@ const createTask = asyncHandler(async (req ) => {
 });
 
 const getTasks = asyncHandler(async (req , res) => {
-    const { project } = await validateProject();
+    const { project } = await validateProject(req);
 
     const fetchTasks = await Task.find({project : project._id}).sort({createdAt : -1});
     return res.status(200).json(new ApiResponse(200 , {fetchTasks} , "Tasks Fetched Successfully..."))
 });
 
 const getTaskById = asyncHandler(async (req , res) => {
-    await validateProject();
-
     const taskId = req.params.id;
     if(!taskId){
         throw new ApiError(404 , "Task Id not found...")
     }
+
+    await validateProject(req);
 
     const fetchTaskById = await Task.findById(taskId);
 
@@ -65,12 +66,13 @@ const getTaskById = asyncHandler(async (req , res) => {
 });
 
 const updateTask = asyncHandler(async (req , res) => {
-    await validateProject();
 
     const taskId = req.params.id;
     if(!taskId){
         throw new ApiError(404 , "Task Id not found...")
     }
+
+    await validateProject(req);
 
     const updatedTask = await Task.findByIdAndUpdate(taskId , 
         {
@@ -86,12 +88,12 @@ const updateTask = asyncHandler(async (req , res) => {
 });
 
 const deleteTask = asyncHandler(async (req , res) => {
-    await validateProject();
-
     const taskId = req.params.id;
     if(!taskId){
         throw new ApiError(404 , "Task Id not found...")
     }
+
+    await validateProject(req);
 
     await Task.findByIdAndDelete(taskId);
 
@@ -99,6 +101,30 @@ const deleteTask = asyncHandler(async (req , res) => {
 
 });
 
-const toggleTaskStatus = asyncHandler(async (req , res) => {});
+const toggleTaskStatus = asyncHandler(async (req , res) => {
+   const taskId = req.params.id;
+    if(!taskId){
+        throw new ApiError(404 , "Task Id not found...")
+    }
+
+    const task = await Task.findById(taskId)
+    if(!task){
+        throw new ApiError(404 , "Task does not exists...")
+    }
+
+    await validateProject(req);
+
+    task.completed = !task.completed
+    await task.save()
+
+     return res.status(200).json(
+        new ApiResponse(
+            200,
+            task,
+            `Task marked as ${task.completed ? "completed" : "pending"}`
+        )
+    );
+
+});
 
 export { createTask , getTasks , getTaskById , updateTask , deleteTask , toggleTaskStatus }
