@@ -53,7 +53,7 @@ const getTasks = asyncHandler(async (req , res) => {
 const getTaskById = asyncHandler(async (req , res) => {
     await validateProject();
 
-    const taskId = req.params;
+    const taskId = req.params.id;
     if(!taskId){
         throw new ApiError(404 , "Task Id not found...")
     }
@@ -64,9 +64,40 @@ const getTaskById = asyncHandler(async (req , res) => {
 
 });
 
-const updateTask = asyncHandler(async (req , res) => {});
+const updateTask = asyncHandler(async (req , res) => {
+    await validateProject();
 
-const deleteTask = asyncHandler(async (req , res) => {});
+    const taskId = req.params.id;
+    if(!taskId){
+        throw new ApiError(404 , "Task Id not found...")
+    }
+
+    const updatedTask = await Task.findByIdAndUpdate(taskId , 
+        {
+            $set : {
+                title
+            }
+        },
+        { new : true}
+    )
+
+    return res.status(200).json(new ApiResponse(200 , {updatedTask} , "Task Updated Successfully..."));
+
+});
+
+const deleteTask = asyncHandler(async (req , res) => {
+    await validateProject();
+
+    const taskId = req.params.id;
+    if(!taskId){
+        throw new ApiError(404 , "Task Id not found...")
+    }
+
+    await Task.findByIdAndDelete(taskId);
+
+     return res.status(200).json(new ApiResponse(200 , {} , "Task deleted  successfully..."))
+
+});
 
 const toggleTaskStatus = asyncHandler(async (req , res) => {});
 
