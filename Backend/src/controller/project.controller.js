@@ -34,7 +34,25 @@ const getProjects = asyncHandler(async (req , res) => {
             .json(new ApiResponse(200 , projects , "Projects fetched successfully..."))
 });
 
-const getProjectById = asyncHandler(async (req , res) => {});
+const getProjectById = asyncHandler(async (req , res) => {
+    const projectId = req.params.id;
+    if(!projectId){
+        throw new ApiError(404 , "Project Id not found...")
+    }
+    const user = req.user._id;
+    
+    const project = await Project.findById(projectId);
+    if(!project){
+        throw new ApiError(404 , "Project not found...")
+    }
+
+    if(project.user.toString() !== user.toString()){
+        throw new ApiError(403 , "You are not authorized to access this project...")
+    }
+
+    return res.status(200)
+            .json(new ApiResponse(200 , project , "Fetched Project By Id Successfully..."))
+});
 
 const updateProject = asyncHandler(async (req , res) => {});
 
