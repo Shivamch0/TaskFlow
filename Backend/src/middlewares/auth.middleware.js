@@ -13,7 +13,7 @@ const verifyJWT = asyncHandler( async (req , res , next) => {
             throw new ApiError(401 , "Unauthorized request: Token missing...")
         }
         //! verify it with access Token secret 
-        const decodedToken = await jwt.verify(token , process.env.ACCESS_TOKEN_SECRET);
+        const decodedToken = jwt.verify(token , process.env.ACCESS_TOKEN_SECRET);
         if(!decodedToken || !decodedToken._id){
             throw new ApiError(401 , "Invalid token. Please log in again.")
         }
