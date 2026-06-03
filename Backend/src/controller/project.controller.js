@@ -104,4 +104,4 @@ const deleteProject = asyncHandler(async (req , res) => {
 });
 
 
-export { createProject , getProjects , getProjectById , updateProject , createProject }
+export { createProject , getProjects , getProjectById , updateProject , deleteProject }
