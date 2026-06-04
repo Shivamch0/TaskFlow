@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useFormik } from "formik"
 import { useAuth } from '../context/AuthContext';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
@@ -8,47 +9,58 @@ import { AlertCircle } from 'lucide-react';
 export default function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
+  const { values , handleSubmit , handleChange } = useFormik({
+    initialValues : {
+      name : "",
+      email : '',
+      password : '',
+      confirmPassword : ''
+    },
+    onSubmit : async (values) => {
+      console.log(values)
+    }
+  })
 
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  // const [name, setName] = useState('');
+  // const [email, setEmail] = useState('');
+  // const [password, setPassword] = useState('');
+  // const [confirmPassword, setConfirmPassword] = useState('');
   
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setError('');
 
-    if (!name || !email || !password || !confirmPassword) {
-      setError('Please fill in all fields');
-      return;
-    }
+  //   if (!name || !email || !password || !confirmPassword) {
+  //     setError('Please fill in all fields');
+  //     return;
+  //   }
 
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
+  //   if (password !== confirmPassword) {
+  //     setError('Passwords do not match');
+  //     return;
+  //   }
 
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters long');
-      return;
-    }
+  //   if (password.length < 6) {
+  //     setError('Password must be at least 6 characters long');
+  //     return;
+  //   }
 
-    setIsLoading(true);
+  //   setIsLoading(true);
 
-    // Simulate small latency for premium feel
-    setTimeout(() => {
-      const res = register(name, email, password);
-      setIsLoading(false);
-      if (res.success) {
-        navigate('/dashboard');
-      } else {
-        setError(res.message || 'Registration failed');
-      }
-    }, 600);
-  };
+  //   // Simulate small latency for premium feel
+  //   setTimeout(() => {
+  //     const res = register(name, email, password);
+  //     setIsLoading(false);
+  //     if (res.success) {
+  //       navigate('/dashboard');
+  //     } else {
+  //       setError(res.message || 'Registration failed');
+  //     }
+  //   }, 600);
+  // };
 
   return (
     <div className="space-y-6">
@@ -76,8 +88,9 @@ export default function Register() {
           label="Full Name"
           type="text"
           placeholder="John Doe"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          name="name"
+          value={values.name}
+          onChange={handleChange}
           required
         />
 
@@ -85,8 +98,9 @@ export default function Register() {
           label="Email Address"
           type="email"
           placeholder="you@example.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          name="email"
+          value={values.email}
+          onChange={handleChange}
           required
         />
 
@@ -94,8 +108,9 @@ export default function Register() {
           label="Password"
           type="password"
           placeholder="••••••••"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          name='password'
+          value={values.password}
+          onChange={handleChange}
           required
         />
 
@@ -103,8 +118,9 @@ export default function Register() {
           label="Confirm Password"
           type="password"
           placeholder="••••••••"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
+          name="confirmPassword"
+          value={values.confirmPassword}
+          onChange={handleChange}
           required
         />
 

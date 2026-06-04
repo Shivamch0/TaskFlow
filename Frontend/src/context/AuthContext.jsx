@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { DEFAULT_USER } from '../data/initialData';
 
 const AuthContext = createContext();
 

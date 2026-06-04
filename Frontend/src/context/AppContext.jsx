@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { INITIAL_PROJECTS } from '../data/initialData';
 import { useAuth } from './AuthContext';
 
 const AppContext = createContext();
@@ -12,10 +11,8 @@ export function AppProvider({ children }) {
     try {
       //! Local Storage
       const stored = window.localStorage.getItem('taskflow_projects');
-      return stored ? JSON.parse(stored) : INITIAL_PROJECTS;
     } catch (e) {
       console.error(e);
-      return INITIAL_PROJECTS;
     }
   });
 

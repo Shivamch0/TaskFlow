@@ -1,13 +1,12 @@
+import dotenv from 'dotenv';
+dotenv.config({
+    path : ".env"
+});
+ 
+
 import express, { urlencoded } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-
-// ? Routes Import 
-import userRouter from './routes/user.route.js';
-import projectRouter from './routes/project.route.js';
-import taskRouter from './routes/task.route.js';
-import subTaskRouter from './routes/subTask.route.js';
-import errorHandler from './middlewares/error.middleware.js';
 
 const app = express();
 
@@ -20,6 +19,13 @@ app.use(cookieParser());
 
 app.use(express.json({limit : '16kb'}));
 app.use(urlencoded());
+
+// ? Routes Import 
+import userRouter from './routes/user.route.js';
+import projectRouter from './routes/project.route.js';
+import taskRouter from './routes/task.route.js';
+import subTaskRouter from './routes/subTask.route.js';
+import errorHandler from './middlewares/error.middleware.js';
 
 app.use("/api/v1/user" , userRouter);
 app.use("/api/v1/project" , projectRouter);
