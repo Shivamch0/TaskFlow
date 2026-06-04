@@ -1,0 +1,203 @@
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useApp } from '../context/AppContext';
+import { ProjectCard } from '../components/ProjectCard';
+import { SearchBar } from '../components/SearchBar';
+import { Modal } from '../components/Modal';
+import { Input } from '../components/Input';
+import { Button } from '../components/Button';
+import { EmptyState } from '../components/EmptyState';
+import { FolderKanban, Plus, Filter } from 'lucide-react';
+
+export default function Projects() {
+  const { projects, createProject, updateProject, deleteProject } = useApp();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Search & Filter State
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterState, setFilterState] = useState('All'); // 'All', 'In Progress', 'Completed'
+
+  // Modal States
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingProject, setEditingProject] = useState(null);
+  
+  // Form States
+  const [formTitle, setFormTitle] = useState('');
+  const [formDesc, setFormDesc] = useState('');
+  const [formError, setFormError] = useState('');
+
+  // Handle URL query parameter `?create=true`
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('create') === 'true') {
+      handleOpenCreateModal();
+      // Clear query params to prevent reopening on reload
+      navigate('/projects', { replace: true });
+    }
+  }, [location, navigate]);
+
+  const handleOpenCreateModal = () => {
+    setEditingProject(null);
+    setFormTitle('');
+    setFormDesc('');
+    setFormError('');
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEditModal = (project) => {
+    setEditingProject(project);
+    setFormTitle(project.title);
+    setFormDesc(project.description || '');
+    setFormError('');
+    setIsModalOpen(true);
+  };
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    setFormError('');
+
+    if (!formTitle.trim()) {
+      setFormError('Project title is required.');
+      return;
+    }
+
+    if (editingProject) {
+      updateProject(editingProject.id, formTitle.trim(), formDesc.trim());
+    } else {
+      createProject(formTitle.trim(), formDesc.trim());
+    }
+
+    setIsModalOpen(false);
+  };
+
+  const handleDeleteProject = (projectId) => {
+    if (window.confirm('Are you sure you want to delete this project? All tasks inside will be permanently deleted.')) {
+      deleteProject(projectId);
+    }
+  };
+
+  // Filter & Search Logic
+  const filteredProjects = projects.filter((proj) => {
+    const matchesSearch = 
+      proj.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (proj.description && proj.description.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    const matchesFilter = 
+      filterState === 'All' ||
+      (filterState === 'In Progress' && proj.progress < 100) ||
+      (filterState === 'Completed' && proj.progress === 100);
+
+    return matchesSearch && matchesFilter;
+  });
+
+  return (
+    <div className="space-y-6">
+      {/* Header Panel */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-extrabold text-slate-800 tracking-tight font-display">
+            Projects
+          </h1>
+          <p className="text-sm text-slate-400 font-medium">
+            Manage your workspaces, set priorities, and track milestones.
+          </p>
+        </div>
+        <Button onClick={handleOpenCreateModal} className="flex items-center gap-1.5 self-start sm:self-auto">
+          <Plus className="w-4 h-4" />
+          <span>New Project</span>
+        </Button>
+      </div>
+
+      {/* Search & Filter Toolbar */}
+      <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+        <SearchBar
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search projects..."
+          className="max-w-xs"
+        />
+
+        {/* Filter buttons */}
+        <div className="flex items-center gap-1.5 self-stretch sm:self-auto bg-slate-50 p-1 rounded-lg border border-slate-100">
+          {['All', 'In Progress', 'Completed'].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setFilterState(tab)}
+              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
+                filterState === tab
+                  ? 'bg-white text-indigo-600 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Projects Grid */}
+      {filteredProjects.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredProjects.map((proj) => (
+            <ProjectCard
+              key={proj.id}
+              project={proj}
+              onEdit={handleOpenEditModal}
+              onDelete={handleDeleteProject}
+            />
+          ))}
+        </div>
+      ) : (
+        <EmptyState
+          title={searchQuery || filterState !== 'All' ? "No matching projects" : "No projects found"}
+          description={searchQuery || filterState !== 'All' 
+            ? "Try refining your search keyword or changing your active filters." 
+            : "Get started by creating your first project container!"}
+          icon={FolderKanban}
+          actionLabel={searchQuery || filterState !== 'All' ? "Clear Search Filters" : "Create New Project"}
+          onAction={searchQuery || filterState !== 'All' 
+            ? () => { setSearchQuery(''); setFilterState('All'); } 
+            : handleOpenCreateModal}
+        />
+      )}
+
+      {/* Create / Edit Project Modal */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={editingProject ? "Edit Project Details" : "Create New Project"}
+      >
+        <form onSubmit={handleFormSubmit} className="space-y-4">
+          <Input
+            label="Project Title"
+            type="text"
+            placeholder="e.g. Mobile App Redesign"
+            value={formTitle}
+            onChange={(e) => setFormTitle(e.target.value)}
+            error={formError}
+            required
+            autoFocus
+          />
+
+          <Input
+            label="Project Description"
+            type="textarea"
+            placeholder="Summarize the core goal of this project..."
+            value={formDesc}
+            onChange={(e) => setFormDesc(e.target.value)}
+          />
+
+          <div className="flex justify-end gap-3 pt-4 border-t border-slate-50">
+            <Button variant="outline" onClick={() => setIsModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit">
+              {editingProject ? "Save Changes" : "Create Project"}
+            </Button>
+          </div>
+        </form>
+      </Modal>
+    </div>
+  );
+}

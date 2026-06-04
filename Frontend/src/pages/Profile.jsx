@@ -1,0 +1,208 @@
+import React, { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { useApp } from '../context/AppContext';
+import { Input } from '../components/Input';
+import { Button } from '../components/Button';
+import { 
+  User, 
+  Mail, 
+  Sparkles, 
+  FolderKanban, 
+  CheckCircle2, 
+  Award,
+  RefreshCw
+} from 'lucide-react';
+
+export default function Profile() {
+  const { currentUser, updateProfile } = useAuth();
+  const { projects } = useApp();
+
+  const [name, setName] = useState(currentUser?.name || '');
+  const [avatar, setAvatar] = useState(currentUser?.avatar || '');
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+
+  // Statistics calculation
+  const totalProjects = projects.length;
+  const allTasks = projects.reduce((acc, proj) => acc.concat(proj.tasks || []), []);
+  const totalTasks = allTasks.length;
+  const completedTasks = allTasks.filter(t => t.completed).length;
+  const pendingTasks = totalTasks - completedTasks;
+  const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+  const handleSave = (e) => {
+    e.preventDefault();
+    if (name.trim()) {
+      updateProfile(name.trim(), avatar.trim());
+      setIsEditing(false);
+      setIsSaved(true);
+      setTimeout(() => setIsSaved(false), 3000);
+    }
+  };
+
+  const handleRegenerateAvatar = () => {
+    // Generate a random seed based on current timestamp
+    const randomSeed = Math.random().toString(36).substring(7);
+    const newAvatar = `https://api.dicebear.com/7.x/adventurer/svg?seed=${randomSeed}`;
+    setAvatar(newAvatar);
+    if (!isEditing) {
+      // If not in editing mode, update immediately
+      updateProfile(name, newAvatar);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-extrabold text-slate-800 tracking-tight font-display">
+          User Profile
+        </h1>
+        <p className="text-sm text-slate-400 font-medium">
+          Manage your personal account settings, avatars, and review workspace activity.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        {/* Left Column: Avatar & Edit Form */}
+        <div className="lg:col-span-1 space-y-6">
+          <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-premium flex flex-col items-center text-center">
+            {/* Avatar display */}
+            <div className="relative group mb-4">
+              <img 
+                src={avatar || 'https://api.dicebear.com/7.x/adventurer/svg'} 
+                alt={currentUser?.name} 
+                className="w-28 h-28 rounded-full border-2 border-indigo-500 bg-slate-50 object-cover shadow-sm p-1 transition-all duration-300 group-hover:scale-105"
+              />
+              <button
+                type="button"
+                onClick={handleRegenerateAvatar}
+                className="absolute bottom-0 right-0 p-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-md transition-colors"
+                title="Regenerate Avatar Seed"
+              >
+                <RefreshCw className="w-4 h-4" />
+              </button>
+            </div>
+
+            <h3 className="text-lg font-bold text-slate-800 font-display">
+              {currentUser?.name}
+            </h3>
+            <p className="text-xs text-slate-400 font-medium mb-6">
+              {currentUser?.email}
+            </p>
+
+            {isSaved && (
+              <div className="mb-4 w-full p-2 bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-semibold rounded-lg animate-fade-in">
+                Profile updated successfully!
+              </div>
+            )}
+
+            {isEditing ? (
+              <form onSubmit={handleSave} className="w-full space-y-4 text-left">
+                <Input
+                  label="Display Name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+                <Input
+                  label="Avatar Image URL"
+                  type="text"
+                  value={avatar}
+                  onChange={(e) => setAvatar(e.target.value)}
+                  placeholder="https://example.com/avatar.jpg"
+                />
+                
+                <div className="flex gap-2 pt-2">
+                  <Button type="submit" size="sm" className="flex-1">
+                    Save Changes
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setIsEditing(false)}>
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            ) : (
+              <Button onClick={() => setIsEditing(true)} variant="outline" size="sm" className="w-full">
+                Edit Profile Details
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* Right Column: Statistics */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Stats Overview */}
+          <div className="bg-white p-6 sm:p-8 rounded-xl border border-slate-100 shadow-premium space-y-6">
+            <h3 className="text-base font-bold text-slate-800 font-display flex items-center gap-2">
+              <Sparkles className="w-4.5 h-4.5 text-indigo-600" /> Workspace Analytics
+            </h3>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {/* Projects */}
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-start gap-3">
+                <div className="p-2 bg-indigo-50 rounded-lg text-indigo-600 shrink-0">
+                  <FolderKanban className="w-4 h-4" />
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Projects</p>
+                  <p className="text-xl font-extrabold text-slate-800 font-display">{totalProjects}</p>
+                </div>
+              </div>
+
+              {/* Tasks Completed */}
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-start gap-3">
+                <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600 shrink-0">
+                  <CheckCircle2 className="w-4 h-4" />
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Completed Tasks</p>
+                  <p className="text-xl font-extrabold text-slate-800 font-display">{completedTasks}</p>
+                </div>
+              </div>
+
+              {/* Completion Rate */}
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-start gap-3">
+                <div className="p-2 bg-amber-50 rounded-lg text-amber-600 shrink-0">
+                  <Award className="w-4 h-4" />
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Completion Rate</p>
+                  <p className="text-xl font-extrabold text-slate-800 font-display">{completionRate}%</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Micro Details list */}
+            <div className="pt-4 border-t border-slate-100 space-y-4">
+              <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Account Metrics Details</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm font-semibold text-slate-600">
+                <div className="flex justify-between p-3 bg-slate-50/50 rounded-lg border border-slate-50">
+                  <span>Total Tasks:</span>
+                  <span className="text-slate-800 font-bold">{totalTasks}</span>
+                </div>
+                <div className="flex justify-between p-3 bg-slate-50/50 rounded-lg border border-slate-50">
+                  <span>Pending Tasks:</span>
+                  <span className="text-slate-800 font-bold">{pendingTasks}</span>
+                </div>
+                <div className="flex justify-between p-3 bg-slate-50/50 rounded-lg border border-slate-50">
+                  <span>Registered Account Email:</span>
+                  <span className="text-slate-800 font-bold truncate max-w-[200px]" title={currentUser?.email}>{currentUser?.email}</span>
+                </div>
+                <div className="flex justify-between p-3 bg-slate-50/50 rounded-lg border border-slate-50">
+                  <span>Account Level Badge:</span>
+                  <span className="text-indigo-600 font-bold uppercase text-xs tracking-wider">
+                    {completionRate > 80 ? 'Master Planner' : completionRate > 50 ? 'Workspace Expert' : 'Regular User'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
