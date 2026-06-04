@@ -47,23 +47,23 @@ export function Modal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-300"
+        className="fixed inset-0 bg-slate-900/40 dark:bg-slate-950/60 backdrop-blur-sm transition-opacity duration-300"
         onClick={onClose}
       />
 
       {/* Modal Card */}
       <div 
-        className={`relative w-full bg-white rounded-xl shadow-premium border border-slate-100 overflow-hidden z-10 transform transition-all duration-300 scale-100 animate-fade-in ${sizeClasses[size]} ${className}`}
+        className={`relative w-full bg-white dark:bg-slate-900 rounded-xl shadow-premium border border-slate-100 dark:border-slate-800 overflow-hidden z-10 transform transition-all duration-300 scale-100 animate-fade-in ${sizeClasses[size]} ${className}`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-          <h3 className="text-lg font-bold text-slate-800 tracking-tight font-display">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800">
+          <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 tracking-tight font-display">
             {title}
           </h3>
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-colors"
+            className="p-1.5 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors"
           >
             <X className="w-4 h-4" />
           </button>

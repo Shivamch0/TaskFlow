@@ -17,13 +17,13 @@ export function ProjectCard({ project, onEdit, onDelete }) {
   });
 
   return (
-    <div className="bg-white rounded-xl border border-slate-100 shadow-premium p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-premium-hover group">
+    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 shadow-premium p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-premium-hover group">
       <div>
         {/* Title & Actions */}
         <div className="flex items-start justify-between gap-3 mb-2">
           <h3 
             onClick={() => navigate(`/dashboard/projects/${project.id}`)}
-            className="text-base font-bold text-slate-800 hover:text-indigo-600 cursor-pointer font-display transition-colors line-clamp-1 flex-1"
+            className="text-base font-bold text-slate-800 dark:text-slate-100 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer font-display transition-colors line-clamp-1 flex-1"
           >
             {project.title}
           </h3>
@@ -33,7 +33,7 @@ export function ProjectCard({ project, onEdit, onDelete }) {
                 e.stopPropagation();
                 onEdit(project);
               }}
-              className="p-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded transition-colors"
+              className="p-1 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/20 rounded transition-colors"
               title="Edit Project"
             >
               <Edit className="w-3.5 h-3.5" />
@@ -43,7 +43,7 @@ export function ProjectCard({ project, onEdit, onDelete }) {
                 e.stopPropagation();
                 onDelete(project.id);
               }}
-              className="p-1 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+              className="p-1 text-slate-400 hover:text-red-600 dark:hover:text-red-450 hover:bg-red-50 dark:hover:bg-red-950/20 rounded transition-colors"
               title="Delete Project"
             >
               <Trash2 className="w-3.5 h-3.5" />
@@ -52,7 +52,7 @@ export function ProjectCard({ project, onEdit, onDelete }) {
         </div>
 
         {/* Description */}
-        <p className="text-slate-500 text-sm line-clamp-2 mb-4 leading-relaxed h-10">
+        <p className="text-slate-505 dark:text-slate-400 text-sm line-clamp-2 mb-4 leading-relaxed h-10">
           {project.description || "No description provided."}
         </p>
       </div>
@@ -64,21 +64,21 @@ export function ProjectCard({ project, onEdit, onDelete }) {
         </div>
 
         {/* Footer Meta */}
-        <div className="flex items-center justify-between pt-4 border-t border-slate-50 text-xs font-semibold text-slate-400">
+        <div className="flex items-center justify-between pt-4 border-t border-slate-50 dark:border-slate-800 text-xs font-semibold text-slate-400 dark:text-slate-500">
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1" title="Completed tasks">
               <CheckSquare className="w-3.5 h-3.5 text-indigo-500" />
-              <span className="text-slate-600">{completedTasks}/{totalTasks} Tasks</span>
+              <span className="text-slate-600 dark:text-slate-300">{completedTasks}/{totalTasks} Tasks</span>
             </span>
             <span className="flex items-center gap-1" title="Created date">
-              <Calendar className="w-3.5 h-3.5 text-slate-300" />
+              <Calendar className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600" />
               <span>{formattedDate}</span>
             </span>
           </div>
 
           <button
             onClick={() => navigate(`/dashboard/projects/${project.id}`)}
-            className="flex items-center gap-1 text-indigo-600 hover:text-indigo-700 transition-colors font-bold uppercase tracking-wider text-[10px]"
+            className="flex items-center gap-1 text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors font-bold uppercase tracking-wider text-[10px]"
           >
             Open <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
           </button>

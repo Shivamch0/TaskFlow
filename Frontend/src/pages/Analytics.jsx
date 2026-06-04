@@ -70,10 +70,10 @@ export default function Analytics() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-extrabold text-slate-800 tracking-tight font-display">
+        <h1 className="text-2xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight font-display">
           Analytics
         </h1>
-        <p className="text-sm text-slate-400 font-medium">
+        <p className="text-sm text-slate-400 dark:text-slate-500 font-medium">
           Monitor your productivity patterns, completion velocities, and active status distributions.
         </p>
       </div>
@@ -86,7 +86,7 @@ export default function Analytics() {
 
         <div className="space-y-2 relative z-10">
           <div className="inline-flex items-center gap-1 bg-indigo-500/30 text-indigo-100 px-2 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5" /> Performance Summary
+            <Sparkles className="w-3.5 h-3.5 text-indigo-500" /> Performance Summary
           </div>
           <h2 className="text-xl font-bold font-display">Keep it up! Your completion rate is excellent</h2>
           <p className="text-sm text-indigo-100 max-w-lg leading-relaxed">
@@ -116,23 +116,23 @@ export default function Analytics() {
         <div className="lg:col-span-2 space-y-6">
           
           {/* Chart Card */}
-          <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-premium">
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-100 dark:border-slate-800 shadow-premium">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
               <div>
-                <h3 className="text-base font-bold text-slate-800 font-display flex items-center gap-2">
-                  <BarChart3 className="w-4 h-4 text-indigo-600" /> Task Velocity
+                <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 font-display flex items-center gap-2">
+                  <BarChart3 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" /> Task Velocity
                 </h3>
-                <p className="text-xs text-slate-400">Comparing expected target versus actual completed tasks</p>
+                <p className="text-xs text-slate-400 dark:text-slate-500">Comparing expected target versus actual completed tasks</p>
               </div>
 
               {/* Tab Selector */}
-              <div className="flex bg-slate-50 p-0.5 rounded-lg border border-slate-100 self-start sm:self-auto">
+              <div className="flex bg-slate-50 dark:bg-slate-850 p-0.5 rounded-lg border border-slate-100 dark:border-slate-800 self-start sm:self-auto">
                 <button
                   onClick={() => setActiveTab('weekly')}
                   className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
                     activeTab === 'weekly'
-                      ? 'bg-white text-indigo-600 shadow-sm'
-                      : 'text-slate-500 hover:text-slate-700'
+                      ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-205'
                   }`}
                 >
                   Weekly View
@@ -141,8 +141,8 @@ export default function Analytics() {
                   onClick={() => setActiveTab('monthly')}
                   className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
                     activeTab === 'monthly'
-                      ? 'bg-white text-indigo-600 shadow-sm'
-                      : 'text-slate-500 hover:text-slate-700'
+                      ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-205'
                   }`}
                 >
                   Monthly Target
@@ -162,15 +162,15 @@ export default function Analytics() {
                         {/* Side by side bars */}
                         <div className="flex items-end justify-center gap-1.5 w-full h-full max-h-[80%]">
                           {/* Target bar */}
-                          <div className="w-3 sm:w-4 bg-slate-100 rounded-t h-full flex items-end">
+                          <div className="w-3 sm:w-4 bg-slate-100 dark:bg-slate-800 rounded-t h-full flex items-end">
                             <div 
-                              className="w-full bg-slate-300 rounded-t hover:bg-slate-400 transition-all duration-300"
+                              className="w-full bg-slate-300 dark:bg-slate-700 rounded-t hover:bg-slate-400 transition-all duration-300"
                               style={{ height: `${targetHeight}%` }}
                               title={`Target: ${item.target}`}
                             />
                           </div>
                           {/* Actual bar */}
-                          <div className="w-3 sm:w-4 bg-indigo-100 rounded-t h-full flex items-end">
+                          <div className="w-3 sm:w-4 bg-indigo-100 dark:bg-indigo-950/30 rounded-t h-full flex items-end">
                             <div 
                               className="w-full bg-indigo-500 rounded-t hover:bg-indigo-600 transition-all duration-300"
                               style={{ height: `${actualHeight}%` }}
@@ -178,15 +178,15 @@ export default function Analytics() {
                             />
                           </div>
                         </div>
-                        <span className="text-xs font-semibold text-slate-400">{item.day}</span>
+                        <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">{item.day}</span>
                       </div>
                     );
                   })}
                 </div>
                 {/* Legend */}
-                <div className="flex justify-center gap-6 pt-2 text-xs font-semibold text-slate-400">
+                <div className="flex justify-center gap-6 pt-2 text-xs font-semibold text-slate-400 dark:text-slate-500">
                   <div className="flex items-center gap-1.5">
-                    <span className="w-3 h-3 bg-slate-300 rounded-xs" />
+                    <span className="w-3 h-3 bg-slate-300 dark:bg-slate-700 rounded-xs" />
                     <span>Target Target</span>
                   </div>
                   <div className="flex items-center gap-1.5">
@@ -202,14 +202,14 @@ export default function Analytics() {
               <div className="grid grid-cols-12 gap-2 h-48 items-end px-1 pt-4">
                 {mockMonthlyData.map((item, idx) => (
                   <div key={idx} className="flex flex-col items-center gap-2 h-full justify-end group">
-                    <div className="w-3 bg-slate-100 rounded-t h-full max-h-[80%] flex items-end">
+                    <div className="w-3 bg-slate-100 dark:bg-slate-800 rounded-t h-full max-h-[80%] flex items-end">
                       <div 
                         className="w-full bg-indigo-500 hover:bg-indigo-600 rounded-t transition-all duration-500" 
                         style={{ height: `${item.value}%` }}
                         title={`${item.month}: ${item.value}%`}
                       />
                     </div>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase">{item.month}</span>
+                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">{item.month}</span>
                   </div>
                 ))}
               </div>
@@ -218,28 +218,28 @@ export default function Analytics() {
           </div>
 
           {/* Completion Trends Chart (Line Chart Visual) */}
-          <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-premium">
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-100 dark:border-slate-800 shadow-premium">
             <div className="mb-4">
-              <h3 className="text-base font-bold text-slate-800 font-display flex items-center gap-2">
+              <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 font-display flex items-center gap-2">
                 <TrendingUp className="w-4 h-4 text-emerald-500" /> Completion Trend Line
               </h3>
-              <p className="text-xs text-slate-400">Velocity performance trajectory over the last week</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500">Velocity performance trajectory over the last week</p>
             </div>
 
             {/* SVG Line Chart Graph */}
             <div className="relative pt-6">
               <svg viewBox="0 0 360 160" className="w-full h-auto overflow-visible">
                 {/* Horizontal Guide lines */}
-                <line x1="30" y1="25" x2="330" y2="25" stroke="#f1f5f9" strokeWidth="1" strokeDasharray="4" />
-                <line x1="30" y1="70" x2="330" y2="70" stroke="#f1f5f9" strokeWidth="1" strokeDasharray="4" />
-                <line x1="30" y1="110" x2="330" y2="110" stroke="#f1f5f9" strokeWidth="1" strokeDasharray="4" />
-                <line x1="30" y1="150" x2="330" y2="150" stroke="#e2e8f0" strokeWidth="1.5" />
+                <line x1="30" y1="25" x2="330" y2="25" stroke="#f1f5f9" className="stroke-slate-100 dark:stroke-slate-800" strokeWidth="1" strokeDasharray="4" />
+                <line x1="30" y1="70" x2="330" y2="70" stroke="#f1f5f9" className="stroke-slate-100 dark:stroke-slate-800" strokeWidth="1" strokeDasharray="4" />
+                <line x1="30" y1="110" x2="330" y2="110" stroke="#f1f5f9" className="stroke-slate-100 dark:stroke-slate-800" strokeWidth="1" strokeDasharray="4" />
+                <line x1="30" y1="150" x2="330" y2="150" stroke="#e2e8f0" className="stroke-slate-200 dark:stroke-slate-700" strokeWidth="1.5" />
 
                 {/* Y-Axis Label Texts */}
-                <text x="10" y="30" className="text-[9px] font-bold fill-slate-300">100%</text>
-                <text x="10" y="75" className="text-[9px] font-bold fill-slate-300">50%</text>
-                <text x="10" y="115" className="text-[9px] font-bold fill-slate-300">20%</text>
-                <text x="10" y="153" className="text-[9px] font-bold fill-slate-300">0%</text>
+                <text x="10" y="30" className="text-[9px] font-bold fill-slate-300 dark:fill-slate-600">100%</text>
+                <text x="10" y="75" className="text-[9px] font-bold fill-slate-300 dark:fill-slate-600">50%</text>
+                <text x="10" y="115" className="text-[9px] font-bold fill-slate-300 dark:fill-slate-600">20%</text>
+                <text x="10" y="153" className="text-[9px] font-bold fill-slate-300 dark:fill-slate-600">0%</text>
 
                 {/* Graph Fill Area */}
                 <path d={areaD} fill="url(#lineGradient)" opacity="0.15" />
@@ -255,6 +255,7 @@ export default function Analytics() {
                     cy={p.y}
                     r="4.5"
                     fill="#ffffff"
+                    className="dark:fill-slate-900"
                     stroke="#6366f1"
                     strokeWidth="3"
                     className="cursor-pointer hover:r-[6.5] transition-all"
@@ -265,13 +266,13 @@ export default function Analytics() {
                 <defs>
                   <linearGradient id="lineGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#6366f1" />
-                    <stop offset="100%" stopColor="#ffffff" />
+                    <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
                   </linearGradient>
                 </defs>
               </svg>
 
               {/* X Axis Labels */}
-              <div className="flex justify-between pl-7 pr-[18px] mt-2 text-xs font-semibold text-slate-400">
+              <div className="flex justify-between pl-7 pr-[18px] mt-2 text-xs font-semibold text-slate-400 dark:text-slate-500">
                 <span>Mon</span>
                 <span>Tue</span>
                 <span>Wed</span>
@@ -289,18 +290,18 @@ export default function Analytics() {
         <div className="space-y-6">
           
           {/* Priority Breakdown (PieChart Visual) */}
-          <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-premium">
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-100 dark:border-slate-800 shadow-premium">
             <div className="mb-6">
-              <h3 className="text-base font-bold text-slate-800 font-display flex items-center gap-2">
-                <PieChart className="w-4 h-4 text-indigo-600" /> Priority Distributions
+              <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 font-display flex items-center gap-2">
+                <PieChart className="w-4 h-4 text-indigo-600 dark:text-indigo-400" /> Priority Distributions
               </h3>
-              <p className="text-xs text-slate-400">Breakdown of tasks based on priority</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500">Breakdown of tasks based on priority</p>
             </div>
 
             {totalTasks > 0 ? (
               <div className="space-y-6">
                 {/* Custom Stacked Progress Meter */}
-                <div className="flex h-5 w-full rounded-full overflow-hidden border border-white">
+                <div className="flex h-5 w-full rounded-full overflow-hidden border border-white dark:border-slate-800">
                   <div 
                     className="bg-red-500 h-full hover:opacity-90 transition-opacity"
                     style={{ width: `${(highPriority.length / totalTasks) * 100}%` }}
@@ -322,7 +323,7 @@ export default function Analytics() {
                 <div className="space-y-4">
                   {/* High */}
                   <div className="space-y-1">
-                    <div className="flex items-center justify-between text-xs font-bold text-slate-600">
+                    <div className="flex items-center justify-between text-xs font-bold text-slate-600 dark:text-slate-300">
                       <div className="flex items-center gap-2">
                         <span className="w-2.5 h-2.5 bg-red-500 rounded-full" />
                         <span>High Priority</span>
@@ -337,7 +338,7 @@ export default function Analytics() {
 
                   {/* Medium */}
                   <div className="space-y-1">
-                    <div className="flex items-center justify-between text-xs font-bold text-slate-600">
+                    <div className="flex items-center justify-between text-xs font-bold text-slate-600 dark:text-slate-300">
                       <div className="flex items-center gap-2">
                         <span className="w-2.5 h-2.5 bg-amber-500 rounded-full" />
                         <span>Medium Priority</span>
@@ -352,7 +353,7 @@ export default function Analytics() {
 
                   {/* Low */}
                   <div className="space-y-1">
-                    <div className="flex items-center justify-between text-xs font-bold text-slate-600">
+                    <div className="flex items-center justify-between text-xs font-bold text-slate-600 dark:text-slate-300">
                       <div className="flex items-center gap-2">
                         <span className="w-2.5 h-2.5 bg-blue-500 rounded-full" />
                         <span>Low Priority</span>
@@ -367,29 +368,29 @@ export default function Analytics() {
                 </div>
               </div>
             ) : (
-              <div className="py-8 text-center text-slate-400 text-sm">
+              <div className="py-8 text-center text-slate-400 dark:text-slate-500 text-sm">
                 No tasks available for priority analytics.
               </div>
             )}
           </div>
 
           {/* Productivity tips */}
-          <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-premium">
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-100 dark:border-slate-800 shadow-premium">
             <div className="flex items-center gap-2 mb-3">
-              <CheckCircle className="w-5 h-5 text-indigo-600" />
-              <h4 className="text-sm font-bold text-slate-800 font-display">Productivity Recommendations</h4>
+              <CheckCircle className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+              <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 font-display">Productivity Recommendations</h4>
             </div>
-            <ul className="text-xs text-slate-500 space-y-2.5 leading-relaxed">
+            <ul className="text-xs text-slate-505 dark:text-slate-400 space-y-2.5 leading-relaxed">
               <li className="flex gap-2">
-                <span className="text-indigo-600 font-bold">1.</span>
+                <span className="text-indigo-600 dark:text-indigo-400 font-bold">1.</span>
                 <span>Focus on completing <b>High Priority</b> items first. High priority tasks currently show a <b>{highPriority.length > 0 ? Math.round((highComp / highPriority.length) * 100) : 0}%</b> resolution speed.</span>
               </li>
               <li className="flex gap-2">
-                <span className="text-indigo-600 font-bold">2.</span>
+                <span className="text-indigo-600 dark:text-indigo-400 font-bold">2.</span>
                 <span>Keep tasks small. Break down large tasks by adding <b>Subtasks</b> to improve progress visibility.</span>
               </li>
               <li className="flex gap-2">
-                <span className="text-indigo-600 font-bold">3.</span>
+                <span className="text-indigo-600 dark:text-indigo-400 font-bold">3.</span>
                 <span>Clean up overdue tasks. Regularly adjust due dates or mark completed to maintain clean workspaces.</span>
               </li>
             </ul>

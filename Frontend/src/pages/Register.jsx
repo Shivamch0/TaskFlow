@@ -53,19 +53,19 @@ export default function Register() {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-xl font-bold text-slate-800 font-display">
+        <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 font-display">
           Create a new account
         </h3>
-        <p className="mt-1.5 text-xs font-semibold text-slate-400">
+        <p className="mt-1.5 text-xs font-semibold text-slate-400 dark:text-slate-500">
           Or{' '}
-          <Link to="/login" className="text-indigo-600 hover:text-indigo-700 transition-colors">
+          <Link to="/login" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors">
             sign in to your existing account
           </Link>
         </p>
       </div>
 
       {error && (
-        <div className="p-3.5 bg-red-50 border border-red-100 rounded-lg text-red-700 text-xs font-medium flex items-start gap-2 animate-fade-in">
+        <div className="p-3.5 bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/50 rounded-lg text-red-700 dark:text-red-400 text-xs font-medium flex items-start gap-2 animate-fade-in">
           <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
           <span>{error}</span>
         </div>

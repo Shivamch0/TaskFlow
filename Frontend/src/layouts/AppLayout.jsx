@@ -14,7 +14,7 @@ export function AppLayout() {
   }
 
   return (
-    <div className="flex h-screen bg-slate-50/50 overflow-hidden">
+    <div className="flex h-screen bg-slate-50/50 dark:bg-slate-950 overflow-hidden">
       {/* Sidebar Navigation */}
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 

@@ -40,19 +40,19 @@ export default function Login() {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-xl font-bold text-slate-800 font-display">
+        <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 font-display">
           Sign in to your account
         </h3>
-        <p className="mt-1.5 text-xs font-semibold text-slate-400">
+        <p className="mt-1.5 text-xs font-semibold text-slate-400 dark:text-slate-500">
           Or{' '}
-          <Link to="/register" className="text-indigo-600 hover:text-indigo-700 transition-colors">
+          <Link to="/register" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors">
             create a new account
           </Link>
         </p>
       </div>
 
       {error && (
-        <div className="p-3.5 bg-red-50 border border-red-100 rounded-lg text-red-700 text-xs font-medium flex items-start gap-2 animate-fade-in">
+        <div className="p-3.5 bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/50 rounded-lg text-red-700 dark:text-red-400 text-xs font-medium flex items-start gap-2 animate-fade-in">
           <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
           <span>{error}</span>
         </div>
@@ -87,10 +87,10 @@ export default function Login() {
       </form>
 
       {/* Mock login tip */}
-      <div className="p-3 bg-slate-50 border border-slate-100 rounded-lg text-slate-500 text-xs">
-        <p className="font-bold text-slate-600 mb-1">💡 Demo Credentials:</p>
-        <p>Email: <span className="font-mono font-semibold text-slate-700 select-all">test@example.com</span></p>
-        <p>Password: <span className="font-mono font-semibold text-slate-700 select-all">password123</span></p>
+      <div className="p-3 bg-slate-50 dark:bg-slate-850 border border-slate-100 dark:border-slate-800 rounded-lg text-slate-500 dark:text-slate-400 text-xs">
+        <p className="font-bold text-slate-600 dark:text-slate-300 mb-1">💡 Demo Credentials:</p>
+        <p>Email: <span className="font-mono font-semibold text-slate-700 dark:text-slate-200 select-all">test@example.com</span></p>
+        <p>Password: <span className="font-mono font-semibold text-slate-700 dark:text-slate-200 select-all">password123</span></p>
       </div>
     </div>
   );

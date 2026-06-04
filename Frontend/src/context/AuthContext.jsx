@@ -1,9 +1,42 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { DEFAULT_USER } from '../data/initialData';
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
+  // Manage theme state
+  const [theme, setTheme] = useState(() => {
+    try {
+      //! Local Storage
+      const storedTheme = window.localStorage.getItem('taskflow_theme');
+      return storedTheme || 'light';
+    } catch (e) {
+      console.error(e);
+      return 'light';
+    }
+  });
+
+  // Toggle theme
+  const toggleTheme = () => {
+    const nextTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(nextTheme);
+    try {
+      //! Local Storage
+      window.localStorage.setItem('taskflow_theme', nextTheme);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // Synchronize HTML element class
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
+
   // Check if user is logged in
   const [currentUser, setCurrentUser] = useState(() => {
     try {
@@ -95,7 +128,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ currentUser, login, register, logout, updateProfile }}>
+    <AuthContext.Provider value={{ currentUser, login, register, logout, updateProfile, theme, toggleTheme }}>
       {children}
     </AuthContext.Provider>
   );

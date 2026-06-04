@@ -10,13 +10,13 @@ export function StatsCard({
   iconColor = 'text-indigo-600 bg-indigo-50'
 }) {
   return (
-    <div className={`bg-white p-6 rounded-xl border border-slate-100 shadow-premium transition-all duration-200 hover:shadow-premium-hover ${className}`}>
+    <div className={`bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-100 dark:border-slate-800 shadow-premium transition-all duration-200 hover:shadow-premium-hover ${className}`}>
       <div className="flex items-start justify-between">
         <div className="space-y-1">
-          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+          <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
             {title}
           </p>
-          <p className="text-3xl font-bold text-slate-800 font-display">
+          <p className="text-3xl font-bold text-slate-800 dark:text-slate-100 font-display">
             {value}
           </p>
         </div>

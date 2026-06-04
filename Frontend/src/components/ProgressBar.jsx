@@ -34,14 +34,14 @@ export function ProgressBar({
   return (
     <div className={`w-full ${className}`}>
       {showText && (
-        <div className="flex justify-between items-center mb-1 text-xs font-semibold text-slate-500">
+        <div className="flex justify-between items-center mb-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
           <span>Progress</span>
-          <span className={`${clampedValue === 100 ? 'text-emerald-600' : 'text-slate-700'}`}>
+          <span className={`${clampedValue === 100 ? 'text-emerald-600' : 'text-slate-700 dark:text-slate-300'}`}>
             {clampedValue}%
           </span>
         </div>
       )}
-      <div className={`w-full bg-slate-100 rounded-full overflow-hidden ${heights[size]}`}>
+      <div className={`w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden ${heights[size]}`}>
         <div
           className={`h-full rounded-full transition-all duration-500 ease-out ${progressColor}`}
           style={{ width: `${clampedValue}%` }}

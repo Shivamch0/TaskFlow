@@ -96,10 +96,10 @@ export default function Projects() {
       {/* Header Panel */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-800 tracking-tight font-display">
+          <h1 className="text-2xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight font-display">
             Projects
           </h1>
-          <p className="text-sm text-slate-400 font-medium">
+          <p className="text-sm text-slate-400 dark:text-slate-500 font-medium">
             Manage your workspaces, set priorities, and track milestones.
           </p>
         </div>
@@ -110,7 +110,7 @@ export default function Projects() {
       </div>
 
       {/* Search & Filter Toolbar */}
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+      <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
         <SearchBar
           value={searchQuery}
           onChange={setSearchQuery}
@@ -119,15 +119,15 @@ export default function Projects() {
         />
 
         {/* Filter buttons */}
-        <div className="flex items-center gap-1.5 self-stretch sm:self-auto bg-slate-50 p-1 rounded-lg border border-slate-100">
+        <div className="flex items-center gap-1.5 self-stretch sm:self-auto bg-slate-50 dark:bg-slate-850 p-1 rounded-lg border border-slate-100 dark:border-slate-800">
           {['All', 'In Progress', 'Completed'].map((tab) => (
             <button
               key={tab}
               onClick={() => setFilterState(tab)}
               className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
                 filterState === tab
-                  ? 'bg-white text-indigo-600 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-700'
+                  ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                  : 'text-slate-550 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
               }`}
             >
               {tab}
@@ -188,7 +188,7 @@ export default function Projects() {
             onChange={(e) => setFormDesc(e.target.value)}
           />
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-slate-50">
+          <div className="flex justify-end gap-3 pt-4 border-t border-slate-50 dark:border-slate-800">
             <Button variant="outline" onClick={() => setIsModalOpen(false)}>
               Cancel
             </Button>

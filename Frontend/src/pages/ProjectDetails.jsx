@@ -158,20 +158,20 @@ export default function ProjectDetails() {
       <div>
         <Link 
           to="/dashboard/projects"
-          className="inline-flex items-center gap-1 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors uppercase tracking-wider mb-2"
+          className="inline-flex items-center gap-1 text-xs font-bold text-slate-400 dark:text-slate-500 hover:text-slate-655 dark:hover:text-slate-300 transition-colors uppercase tracking-wider mb-2"
         >
           <ArrowLeft className="w-3.5 h-3.5" /> Back to Projects
         </Link>
       </div>
 
       {/* Project Banner Card */}
-      <div className="bg-white rounded-xl border border-slate-100 shadow-premium p-6 sm:p-8 space-y-6">
+      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 shadow-premium p-6 sm:p-8 space-y-6">
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
           <div className="space-y-2 max-w-3xl">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight font-display">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight font-display">
               {project.title}
             </h1>
-            <p className="text-sm text-slate-500 leading-relaxed">
+            <p className="text-sm text-slate-500 dark:text-slate-405 leading-relaxed">
               {project.description || "No description provided for this project. Double click 'Edit Project' on the list view to add a summary."}
             </p>
           </div>
@@ -181,21 +181,21 @@ export default function ProjectDetails() {
         </div>
 
         {/* Progress summary bar */}
-        <div className="pt-4 border-t border-slate-50 grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+        <div className="pt-4 border-t border-slate-50 dark:border-slate-800 grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
           <div className="md:col-span-2">
             <ProgressBar value={project.progress} showText={true} size="md" />
           </div>
-          <div className="flex items-center gap-4 text-xs font-semibold text-slate-400 justify-start md:justify-end">
+          <div className="flex items-center gap-4 text-xs font-semibold text-slate-400 dark:text-slate-500 justify-start md:justify-end">
             <span className="flex items-center gap-1.5">
               <CheckSquare className="w-4 h-4 text-indigo-500" />
-              <span className="text-slate-600">{completedTasks}/{totalTasks} Tasks Completed</span>
+              <span className="text-slate-600 dark:text-slate-300">{completedTasks}/{totalTasks} Tasks Completed</span>
             </span>
           </div>
         </div>
       </div>
 
       {/* Task Filters and Search Toolbar */}
-      <div className="flex flex-col lg:flex-row gap-4 items-center justify-between bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+      <div className="flex flex-col lg:flex-row gap-4 items-center justify-between bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
         <SearchBar
           value={searchQuery}
           onChange={setSearchQuery}
@@ -205,16 +205,16 @@ export default function ProjectDetails() {
 
         <div className="flex flex-wrap items-center gap-4 self-stretch sm:self-auto justify-between lg:justify-end">
           {/* Status filter */}
-          <div className="flex items-center gap-1 bg-slate-50 p-1 rounded-lg border border-slate-100">
-            <span className="text-[10px] font-bold text-slate-400 uppercase px-2 select-none">Status</span>
+          <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-850 p-1 rounded-lg border border-slate-100 dark:border-slate-800">
+            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase px-2 select-none">Status</span>
             {['All', 'Pending', 'Completed'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setStatusFilter(tab)}
                 className={`px-2.5 py-1 text-xs font-semibold rounded transition-all ${
                   statusFilter === tab
-                    ? 'bg-white text-indigo-600 shadow-xs'
-                    : 'text-slate-500 hover:text-slate-700'
+                    ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-xs'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                 }`}
               >
                 {tab}
@@ -223,16 +223,16 @@ export default function ProjectDetails() {
           </div>
 
           {/* Priority filter */}
-          <div className="flex items-center gap-1 bg-slate-50 p-1 rounded-lg border border-slate-100">
-            <span className="text-[10px] font-bold text-slate-400 uppercase px-2 select-none">Priority</span>
+          <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-850 p-1 rounded-lg border border-slate-100 dark:border-slate-800">
+            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase px-2 select-none">Priority</span>
             {['All', 'High', 'Medium', 'Low'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setPriorityFilter(tab)}
                 className={`px-2.5 py-1 text-xs font-semibold rounded transition-all ${
                   priorityFilter === tab
-                    ? 'bg-white text-indigo-600 shadow-xs'
-                    : 'text-slate-500 hover:text-slate-700'
+                    ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-xs'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                 }`}
               >
                 {tab}
@@ -320,7 +320,7 @@ export default function ProjectDetails() {
             />
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-slate-50">
+          <div className="flex justify-end gap-3 pt-4 border-t border-slate-50 dark:border-slate-800">
             <Button variant="outline" onClick={() => setIsTaskModalOpen(false)}>
               Cancel
             </Button>
