@@ -67,7 +67,7 @@ export default function Dashboard() {
           </p>
         </div>
         <button
-          onClick={() => navigate('/projects?create=true')}
+          onClick={() => navigate('/dashboard/projects?create=true')}
           className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg text-sm transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
@@ -165,7 +165,7 @@ export default function Dashboard() {
                 <p className="text-xs text-slate-400">Quick view of tasks from your projects</p>
               </div>
               <button
-                onClick={() => navigate('/projects')}
+                onClick={() => navigate('/dashboard/projects')}
                 className="flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-700 transition-colors uppercase tracking-wider"
               >
                 All Projects <ArrowRight className="w-3.5 h-3.5" />
@@ -192,7 +192,7 @@ export default function Dashboard() {
 
                       <div className="min-w-0">
                         <p 
-                          onClick={() => navigate(`/projects/${task.projectId}`)}
+                          onClick={() => navigate(`/dashboard/projects/${task.projectId}`)}
                           className={`text-sm font-bold text-slate-700 hover:text-indigo-600 cursor-pointer transition-colors truncate ${
                             task.completed ? 'text-slate-400 line-through' : ''
                           }`}
@@ -232,7 +232,7 @@ export default function Dashboard() {
               <p className="text-xs text-slate-400">Your latest work activities</p>
             </div>
             <button
-              onClick={() => navigate('/projects')}
+              onClick={() => navigate('/dashboard/projects')}
               className="flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-700 transition-colors uppercase tracking-wider"
             >
               See All <ArrowRight className="w-3.5 h-3.5" />
@@ -245,7 +245,7 @@ export default function Dashboard() {
                 <div key={proj.id} className="relative">
                   {/* Simplified Card or Full ProjectCard */}
                   <div 
-                    onClick={() => navigate(`/projects/${proj.id}`)}
+                    onClick={() => navigate(`/dashboard/projects/${proj.id}`)}
                     className="p-5 bg-white rounded-xl border border-slate-100 shadow-premium hover:shadow-premium-hover cursor-pointer transition-all duration-300 group"
                   >
                     <div className="flex items-center justify-between mb-2">

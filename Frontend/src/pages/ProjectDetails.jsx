@@ -58,7 +58,7 @@ export default function ProjectDetails() {
         description="The project you are trying to view does not exist or has been deleted."
         icon={FolderOpen}
         actionLabel="Back to Projects"
-        onAction={() => navigate('/projects')}
+        onAction={() => navigate('/dashboard/projects')}
       />
     );
   }
@@ -157,7 +157,7 @@ export default function ProjectDetails() {
       {/* Back button and breadcrumbs */}
       <div>
         <Link 
-          to="/projects"
+          to="/dashboard/projects"
           className="inline-flex items-center gap-1 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors uppercase tracking-wider mb-2"
         >
           <ArrowLeft className="w-3.5 h-3.5" /> Back to Projects

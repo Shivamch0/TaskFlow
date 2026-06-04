@@ -33,7 +33,7 @@ export default function Projects() {
     if (params.get('create') === 'true') {
       handleOpenCreateModal();
       // Clear query params to prevent reopening on reload
-      navigate('/projects', { replace: true });
+      navigate('/dashboard/projects', { replace: true });
     }
   }, [location, navigate]);
 

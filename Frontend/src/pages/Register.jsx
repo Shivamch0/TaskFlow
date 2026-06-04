@@ -43,7 +43,7 @@ export default function Register() {
       const res = register(name, email, password);
       setIsLoading(false);
       if (res.success) {
-        navigate('/');
+        navigate('/dashboard');
       } else {
         setError(res.message || 'Registration failed');
       }

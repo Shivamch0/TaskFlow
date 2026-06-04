@@ -30,7 +30,7 @@ export default function Login() {
       const res = login(email, password);
       setIsLoading(false);
       if (res.success) {
-        navigate('/');
+        navigate('/dashboard');
       } else {
         setError(res.message || 'Invalid credentials');
       }

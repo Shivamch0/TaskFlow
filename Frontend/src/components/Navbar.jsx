@@ -8,12 +8,12 @@ export function Navbar({ onMenuOpen }) {
   // Get current page name based on path
   const getPageTitle = () => {
     const path = location.pathname;
-    if (path === '/') return 'Dashboard';
-    if (path.startsWith('/projects/')) return 'Project Details';
-    if (path === '/projects') return 'Projects';
-    if (path === '/analytics') return 'Analytics';
-    if (path === '/profile') return 'Profile';
-    if (path === '/settings') return 'Settings';
+    if (path === '/dashboard') return 'Dashboard';
+    if (path.startsWith('/dashboard/projects/')) return 'Project Details';
+    if (path === '/dashboard/projects') return 'Projects';
+    if (path === '/dashboard/analytics') return 'Analytics';
+    if (path === '/dashboard/profile') return 'Profile';
+    if (path === '/dashboard/settings') return 'Settings';
     return 'TaskFlow';
   };
 

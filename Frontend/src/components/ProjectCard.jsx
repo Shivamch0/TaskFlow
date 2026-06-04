@@ -22,7 +22,7 @@ export function ProjectCard({ project, onEdit, onDelete }) {
         {/* Title & Actions */}
         <div className="flex items-start justify-between gap-3 mb-2">
           <h3 
-            onClick={() => navigate(`/projects/${project.id}`)}
+            onClick={() => navigate(`/dashboard/projects/${project.id}`)}
             className="text-base font-bold text-slate-800 hover:text-indigo-600 cursor-pointer font-display transition-colors line-clamp-1 flex-1"
           >
             {project.title}
@@ -77,7 +77,7 @@ export function ProjectCard({ project, onEdit, onDelete }) {
           </div>
 
           <button
-            onClick={() => navigate(`/projects/${project.id}`)}
+            onClick={() => navigate(`/dashboard/projects/${project.id}`)}
             className="flex items-center gap-1 text-indigo-600 hover:text-indigo-700 transition-colors font-bold uppercase tracking-wider text-[10px]"
           >
             Open <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />

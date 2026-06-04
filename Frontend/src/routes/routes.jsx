@@ -6,6 +6,7 @@ import { AppLayout } from '../layouts/AppLayout';
 import { AuthLayout } from '../layouts/AuthLayout';
 
 // Pages
+import Landing from '../pages/Landing';
 import Dashboard from '../pages/Dashboard';
 import Projects from '../pages/Projects';
 import ProjectDetails from '../pages/ProjectDetails';
@@ -16,6 +17,11 @@ import Login from '../pages/Login';
 import Register from '../pages/Register';
 
 export const router = createBrowserRouter([
+  // Public Landing Page (available to everyone)
+  {
+    path: '/',
+    element: <Landing />,
+  },
   // Auth Routes Wrapper
   {
     element: <AuthLayout />,
@@ -32,7 +38,7 @@ export const router = createBrowserRouter([
   },
   // App SaaS Dashboard Routes Wrapper (Protected)
   {
-    path: '/',
+    path: '/dashboard',
     element: <AppLayout />,
     children: [
       {
@@ -64,6 +70,6 @@ export const router = createBrowserRouter([
   // Catch all - redirect to dashboard index or login
   {
     path: '*',
-    element: <Navigate to="/" replace />,
+    element: <Navigate to="/dashboard" replace />,
   },
 ]);

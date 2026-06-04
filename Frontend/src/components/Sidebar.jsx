@@ -22,11 +22,11 @@ export function Sidebar({ isOpen, onClose }) {
   };
 
   const navItems = [
-    { name: 'Dashboard', path: '/', icon: LayoutDashboard },
-    { name: 'Projects', path: '/projects', icon: FolderKanban },
-    { name: 'Analytics', path: '/analytics', icon: BarChart3 },
-    { name: 'Profile', path: '/profile', icon: UserCircle },
-    { name: 'Settings', path: '/settings', icon: SettingsIcon },
+    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    { name: 'Projects', path: '/dashboard/projects', icon: FolderKanban },
+    { name: 'Analytics', path: '/dashboard/analytics', icon: BarChart3 },
+    { name: 'Profile', path: '/dashboard/profile', icon: UserCircle },
+    { name: 'Settings', path: '/dashboard/settings', icon: SettingsIcon },
   ];
 
   return (
@@ -47,7 +47,7 @@ export function Sidebar({ isOpen, onClose }) {
         {/* Top brand header */}
         <div>
           <div className="h-16 px-6 border-b border-slate-100 flex items-center justify-between">
-            <NavLink to="/" className="flex items-center gap-2.5" onClick={onClose}>
+            <NavLink to="/dashboard" className="flex items-center gap-2.5" onClick={onClose}>
               <div className="p-2 bg-indigo-600 rounded-lg text-white">
                 <Layers className="w-5 h-5" />
               </div>

@@ -8,7 +8,7 @@ export function AuthLayout() {
 
   // If user is already authenticated, redirect to dashboard
   if (currentUser) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   return (
