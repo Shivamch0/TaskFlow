@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useFormik } from 'formik'
 import { useAuth } from '../context/AuthContext';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
@@ -9,33 +10,43 @@ export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const { values , handleChange , handleSubmit} = useFormik({
+    initialValues : {
+      email : '',
+      password : ''
+    },
+    onSubmit : async (values) => {
+
+    }
+  })
+
+  // const [email, setEmail] = useState('');
+  // const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setError('');
 
-    if (!email || !password) {
-      setError('Please fill in all fields');
-      return;
-    }
+  //   if (!email || !password) {
+  //     setError('Please fill in all fields');
+  //     return;
+  //   }
 
-    setIsLoading(true);
+  //   setIsLoading(true);
 
-    // Simulate small latency for premium feel
-    setTimeout(() => {
-      const res = login(email, password);
-      setIsLoading(false);
-      if (res.success) {
-        navigate('/dashboard');
-      } else {
-        setError(res.message || 'Invalid credentials');
-      }
-    }, 600);
-  };
+  //   // Simulate small latency for premium feel
+  //   setTimeout(() => {
+  //     const res = login(email, password);
+  //     setIsLoading(false);
+  //     if (res.success) {
+  //       navigate('/dashboard');
+  //     } else {
+  //       setError(res.message || 'Invalid credentials');
+  //     }
+  //   }, 600);
+  // };
 
   return (
     <div className="space-y-6">
@@ -63,8 +74,9 @@ export default function Login() {
           label="Email Address"
           type="email"
           placeholder="you@example.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          name='email'
+          value={values.email}
+          onChange={handleChange}
           required
         />
 
@@ -72,8 +84,9 @@ export default function Login() {
           label="Password"
           type="password"
           placeholder="••••••••"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          name='password'
+          value={values.password}
+          onChange={handleChange}
           required
         />
 
