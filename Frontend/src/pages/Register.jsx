@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
 import { AlertCircle } from 'lucide-react';
+import { registerUser } from '../axios/api/auth.api.js';
 
 export default function Register() {
   const { register } = useAuth();
@@ -18,6 +19,10 @@ export default function Register() {
     },
     onSubmit : async (values) => {
       console.log(values)
+      const res = await register(values);
+
+      console.log(res)
+      console.log("user registered...")
     }
   })
 
