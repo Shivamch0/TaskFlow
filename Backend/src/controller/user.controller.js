@@ -172,4 +172,30 @@ const refreshAccessToken = asyncHandler(async (req , res) => {
     }
 });
 
-export { registerUser, loginUser , logoutUser , currentUser , refreshAccessToken };
+const updateProfile = asyncHandler(async (req, res) => {
+  const { userName, avatar } = req.body;
+  if (!userName?.trim()) {
+    throw new ApiError(400, "Username is required...");
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: {
+        userName: userName.trim(),
+        avatar: avatar || '',
+      },
+    },
+    { new: true }
+  ).select(" -password -refreshToken ");
+
+  if (!updatedUser) {
+    throw new ApiError(400, "Failed to update profile...");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { user: updatedUser }, "Profile updated successfully..."));
+});
+
+export { registerUser, loginUser , logoutUser , currentUser , refreshAccessToken, updateProfile };

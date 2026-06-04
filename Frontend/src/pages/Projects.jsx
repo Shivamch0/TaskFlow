@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 import { useApp } from '../context/AppContext';
 import { ProjectCard } from '../components/ProjectCard';
 import { SearchBar } from '../components/SearchBar';
@@ -7,10 +9,11 @@ import { Modal } from '../components/Modal';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
 import { EmptyState } from '../components/EmptyState';
-import { FolderKanban, Plus, Filter } from 'lucide-react';
+import { Loader } from '../components/Loader';
+import { FolderKanban, Plus } from 'lucide-react';
 
 export default function Projects() {
-  const { projects, createProject, updateProject, deleteProject } = useApp();
+  const { projects, isLoading, createProject, updateProject, deleteProject } = useApp();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -21,11 +24,32 @@ export default function Projects() {
   // Modal States
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
-  
-  // Form States
-  const [formTitle, setFormTitle] = useState('');
-  const [formDesc, setFormDesc] = useState('');
-  const [formError, setFormError] = useState('');
+
+  // Formik form setup with Yup validation schema
+  const formik = useFormik({
+    enableReinitialize: true,
+    initialValues: {
+      title: editingProject ? editingProject.title : '',
+      description: editingProject ? (editingProject.description || '') : '',
+    },
+    validationSchema: Yup.object({
+      title: Yup.string()
+        .min(3, 'Project title must be at least 3 characters')
+        .max(100, 'Project title cannot exceed 100 characters')
+        .required('Project title is required'),
+      description: Yup.string()
+        .max(500, 'Description cannot exceed 500 characters')
+        .optional(),
+    }),
+    onSubmit: async (values) => {
+      if (editingProject) {
+        await updateProject(editingProject.id, values.title.trim(), values.description.trim());
+      } else {
+        await createProject(values.title.trim(), values.description.trim());
+      }
+      setIsModalOpen(false);
+    },
+  });
 
   // Handle URL query parameter `?create=true`
   useEffect(() => {
@@ -39,36 +63,13 @@ export default function Projects() {
 
   const handleOpenCreateModal = () => {
     setEditingProject(null);
-    setFormTitle('');
-    setFormDesc('');
-    setFormError('');
+    formik.resetForm();
     setIsModalOpen(true);
   };
 
   const handleOpenEditModal = (project) => {
     setEditingProject(project);
-    setFormTitle(project.title);
-    setFormDesc(project.description || '');
-    setFormError('');
     setIsModalOpen(true);
-  };
-
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
-    setFormError('');
-
-    if (!formTitle.trim()) {
-      setFormError('Project title is required.');
-      return;
-    }
-
-    if (editingProject) {
-      updateProject(editingProject.id, formTitle.trim(), formDesc.trim());
-    } else {
-      createProject(formTitle.trim(), formDesc.trim());
-    }
-
-    setIsModalOpen(false);
   };
 
   const handleDeleteProject = (projectId) => {
@@ -99,7 +100,7 @@ export default function Projects() {
           <h1 className="text-2xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight font-display">
             Projects
           </h1>
-          <p className="text-sm text-slate-400 dark:text-slate-500 font-medium">
+          <p className="text-sm text-slate-400 dark:text-slate-550 font-medium">
             Manage your workspaces, set priorities, and track milestones.
           </p>
         </div>
@@ -126,8 +127,8 @@ export default function Projects() {
               onClick={() => setFilterState(tab)}
               className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
                 filterState === tab
-                  ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm'
-                  : 'text-slate-550 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                  ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-450 shadow-sm'
+                  : 'text-slate-550 dark:text-slate-450 hover:text-slate-700 dark:hover:text-slate-200'
               }`}
             >
               {tab}
@@ -137,7 +138,9 @@ export default function Projects() {
       </div>
 
       {/* Projects Grid */}
-      {filteredProjects.length > 0 ? (
+      {isLoading ? (
+        <Loader type="card-skeleton" count={6} />
+      ) : filteredProjects.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProjects.map((proj) => (
             <ProjectCard
@@ -168,28 +171,31 @@ export default function Projects() {
         onClose={() => setIsModalOpen(false)}
         title={editingProject ? "Edit Project Details" : "Create New Project"}
       >
-        <form onSubmit={handleFormSubmit} className="space-y-4">
+        <form onSubmit={formik.handleSubmit} className="space-y-4">
           <Input
             label="Project Title"
             type="text"
             placeholder="e.g. Mobile App Redesign"
-            value={formTitle}
-            onChange={(e) => setFormTitle(e.target.value)}
-            error={formError}
-            required
-            autoFocus
+            name="title"
+            value={formik.values.title}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.title && formik.errors.title}
           />
 
           <Input
             label="Project Description"
             type="textarea"
             placeholder="Summarize the core goal of this project..."
-            value={formDesc}
-            onChange={(e) => setFormDesc(e.target.value)}
+            name="description"
+            value={formik.values.description}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.description && formik.errors.description}
           />
 
           <div className="flex justify-end gap-3 pt-4 border-t border-slate-50 dark:border-slate-800">
-            <Button variant="outline" onClick={() => setIsModalOpen(false)}>
+            <Button variant="outline" type="button" onClick={() => setIsModalOpen(false)}>
               Cancel
             </Button>
             <Button type="submit">

@@ -227,12 +227,12 @@ export default function Settings() {
               <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 font-display">System Integrity</h4>
             </div>
             <p className="text-xs text-slate-505 dark:text-slate-400 leading-relaxed">
-              TaskFlow is executing in **Frontend-Only** sandbox mode. All workspace databases modifications are stored in your browser's persistent Local Storage.
+              TaskFlow is connected to a live **Node.js/Express** backend API. All project workspaces, tasks, and subtasks are securely stored in a persistent MongoDB cloud database.
             </p>
             <div className="p-2.5 bg-slate-50 dark:bg-slate-850 border border-slate-100 dark:border-slate-800 rounded-lg text-[10px] text-slate-400 dark:text-slate-500 font-mono">
-              Database storage: localStorage
+              Database storage: MongoDB
               <br />
-              Status: Connected (Local)
+              Status: Connected (Node.js API Server)
             </div>
           </div>
         </div>

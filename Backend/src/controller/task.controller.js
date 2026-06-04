@@ -10,15 +10,18 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
 const createTask = asyncHandler(async (req, res) => {
-  const { title } = req.body;
+  const { title, description, priority, dueDate } = req.body;
   if (!title) {
-    throw new ApiError(400, "Task cannot be empty...");
+    throw new ApiError(400, "Task title cannot be empty...");
   }
 
   const project = await validateProject(req.params.projectId, req.user._id);
 
   const task = await Task.create({
     title,
+    description: description || '',
+    priority: priority || 'Medium',
+    dueDate: dueDate || '',
     project: project._id,
   });
 
@@ -54,7 +57,7 @@ const getTaskById = asyncHandler(async (req, res) => {
 });
 
 const updateTask = asyncHandler(async (req, res) => {
-  const { title } = req.body;
+  const { title, description, priority, dueDate } = req.body;
   if (!title) {
     throw new ApiError(400, "Task title is required...");
   }
@@ -70,6 +73,9 @@ const updateTask = asyncHandler(async (req, res) => {
     {
       $set: {
         title,
+        description: description !== undefined ? description : task.description,
+        priority: priority !== undefined ? priority : task.priority,
+        dueDate: dueDate !== undefined ? dueDate : task.dueDate,
       },
     },
     { new: true },

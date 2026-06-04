@@ -16,16 +16,16 @@ export function Loader({ type = 'spinner', count = 3, className = '' }) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {Array.from({ length: count }).map((_, idx) => (
-          <div key={idx} className="bg-white p-6 rounded-xl border border-slate-100 shadow-premium animate-pulse space-y-4">
-            <div className="h-4 bg-slate-200 rounded w-2/3" />
+          <div key={idx} className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-100 dark:border-slate-800 shadow-premium animate-pulse space-y-4">
+            <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-2/3" />
             <div className="space-y-2">
-              <div className="h-3 bg-slate-200 rounded w-full" />
-              <div className="h-3 bg-slate-200 rounded w-5/6" />
+              <div className="h-3 bg-slate-200 dark:bg-slate-800 rounded w-full" />
+              <div className="h-3 bg-slate-200 dark:bg-slate-800 rounded w-5/6" />
             </div>
-            <div className="h-2 bg-slate-100 rounded w-full" />
+            <div className="h-2 bg-slate-100 dark:bg-slate-850 rounded w-full" />
             <div className="flex justify-between items-center pt-2">
-              <div className="h-4 bg-slate-200 rounded-full w-1/4" />
-              <div className="h-6 bg-slate-200 rounded w-1/6" />
+              <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded-full w-1/4" />
+              <div className="h-6 bg-slate-200 dark:bg-slate-800 rounded w-1/6" />
             </div>
           </div>
         ))}
@@ -37,15 +37,15 @@ export function Loader({ type = 'spinner', count = 3, className = '' }) {
   return (
     <div className={`space-y-3 ${className}`}>
       {Array.from({ length: count }).map((_, idx) => (
-        <div key={idx} className="flex items-center justify-between p-4 bg-white border border-slate-100 rounded-lg animate-pulse">
+        <div key={idx} className="flex items-center justify-between p-4 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-lg animate-pulse">
           <div className="flex items-center gap-3 w-2/3">
-            <div className="w-5 h-5 bg-slate-200 rounded-md" />
+            <div className="w-5 h-5 bg-slate-200 dark:bg-slate-800 rounded-md" />
             <div className="space-y-1.5 w-full">
-              <div className="h-4 bg-slate-200 rounded w-1/3" />
-              <div className="h-3 bg-slate-200 rounded w-2/3" />
+              <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/3" />
+              <div className="h-3 bg-slate-200 dark:bg-slate-800 rounded w-2/3" />
             </div>
           </div>
-          <div className="w-16 h-6 bg-slate-200 rounded-full" />
+          <div className="w-16 h-6 bg-slate-200 dark:bg-slate-800 rounded-full" />
         </div>
       ))}
     </div>

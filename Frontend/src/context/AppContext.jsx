@@ -1,338 +1,340 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
+import api from '../axios/axios';
 
 const AppContext = createContext();
 
 export function AppProvider({ children }) {
   const { currentUser } = useAuth();
   
-  // State for all projects
-  const [projects, setProjects] = useState(() => {
+  const [projects, setProjects] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Recursively map MongoDB _id to frontend-expected id
+  const mapSubtask = (st) => {
+    if (!st) return null;
+    return {
+      ...st,
+      id: st._id,
+    };
+  };
+
+  const mapTask = (t) => {
+    if (!t) return null;
+    return {
+      ...t,
+      id: t._id,
+      subtasks: (t.subtasks || []).map(mapSubtask),
+    };
+  };
+
+  const mapProject = (p) => {
+    if (!p) return null;
+    return {
+      ...p,
+      id: p._id,
+      tasks: (p.tasks || []).map(mapTask),
+    };
+  };
+
+  // Fetch all projects for the logged in user
+  const fetchProjects = async (showLoading = true) => {
+    if (!currentUser) {
+      setProjects([]);
+      return;
+    }
+    if (showLoading) setIsLoading(true);
     try {
-      //! Local Storage
-      const stored = window.localStorage.getItem('taskflow_projects');
-    } catch (e) {
-      console.error(e);
-    }
-  });
-
-  // Save projects to local storage when state changes
-  const saveProjects = (updatedProjects) => {
-    setProjects(updatedProjects);
-    try {
-      //! Local Storage
-      window.localStorage.setItem('taskflow_projects', JSON.stringify(updatedProjects));
-    } catch (e) {
-      console.error(e);
+      const response = await api.get('/project');
+      // The backend returns an array of projects in response.data.data
+      const rawProjects = response.data?.data || [];
+      const mappedProjects = rawProjects.map(mapProject);
+      setProjects(mappedProjects);
+    } catch (error) {
+      console.error('Failed to fetch projects:', error);
+    } finally {
+      if (showLoading) setIsLoading(false);
     }
   };
 
-  // Helper to recalculate a single project's progress
-  const recalculateProgress = (project) => {
-    const tasks = project.tasks || [];
-    
-    // Flatten all subtasks from all tasks
-    const allSubtasks = tasks.reduce((acc, task) => {
-      return acc.concat(task.subtasks || []);
-    }, []);
-
-    const totalSubtasks = allSubtasks.length;
-    
-    if (totalSubtasks > 0) {
-      const completedSubtasks = allSubtasks.filter(st => st.completed).length;
-      return Math.round((completedSubtasks / totalSubtasks) * 100);
-    }
-
-    // Fallback: If no subtasks, calculate based on completed tasks
-    const totalTasks = tasks.length;
-    if (totalTasks > 0) {
-      const completedTasks = tasks.filter(t => t.completed).length;
-      return Math.round((completedTasks / totalTasks) * 100);
-    }
-
-    return 0;
-  };
-
-  // Helper to update progress on a list of projects for a specific project
-  const updateProjectInList = (projectsList, projectId, updates) => {
-    return projectsList.map(proj => {
-      if (proj.id === projectId) {
-        const updatedProj = { ...proj, ...updates };
-        updatedProj.progress = recalculateProgress(updatedProj);
-        return updatedProj;
-      }
-      return proj;
-    });
-  };
+  // Trigger projects loading when user logs in/changes
+  useEffect(() => {
+    fetchProjects(true);
+  }, [currentUser]);
 
   // ==========================================
   // PROJECT OPERATIONS
   // ==========================================
   
-  const createProject = (title, description) => {
-    const newProject = {
-      id: `proj_${Date.now()}`,
-      title,
-      description,
-      createdAt: new Date().toISOString(),
-      progress: 0,
-      tasks: []
-    };
-
-    const updated = [newProject, ...projects];
-    saveProjects(updated);
-    return newProject;
-  };
-
-  const updateProject = (projectId, title, description) => {
-    const updated = projects.map(proj => {
-      if (proj.id === projectId) {
-        return {
-          ...proj,
-          title,
-          description
-        };
+  const createProject = async (title, description) => {
+    try {
+      const response = await api.post('/project', { title, description });
+      if (response.data?.data?.project) {
+        const newProj = mapProject(response.data.data.project);
+        setProjects(prev => [newProj, ...prev]);
+        // Silent refresh to ensure database state is correct
+        fetchProjects(false);
+        return newProj;
       }
-      return proj;
-    });
-    saveProjects(updated);
+    } catch (error) {
+      console.error('Failed to create project:', error);
+    }
   };
 
-  const deleteProject = (projectId) => {
-    const updated = projects.filter(proj => proj.id !== projectId);
-    saveProjects(updated);
+  const updateProject = async (projectId, title, description) => {
+    try {
+      const response = await api.patch(`/project/${projectId}`, { title, description });
+      if (response.data?.data) {
+        const updated = mapProject(response.data.data);
+        setProjects(prev => prev.map(p => p.id === projectId ? { ...p, ...updated } : p));
+        fetchProjects(false);
+      }
+    } catch (error) {
+      console.error('Failed to update project:', error);
+    }
+  };
+
+  const deleteProject = async (projectId) => {
+    try {
+      await api.delete(`/project/${projectId}`);
+      setProjects(prev => prev.filter(p => p.id !== projectId));
+    } catch (error) {
+      console.error('Failed to delete project:', error);
+    }
   };
 
   // ==========================================
   // TASK OPERATIONS
   // ==========================================
 
-  const createTask = (projectId, taskData) => {
+  const createTask = async (projectId, taskData) => {
     const { title, description, priority, dueDate } = taskData;
-    const newTask = {
-      id: `task_${Date.now()}`,
-      title,
-      description: description || '',
-      priority: priority || 'Medium',
-      dueDate: dueDate || '',
-      completed: false,
-      subtasks: []
-    };
-
-    const updated = projects.map(proj => {
-      if (proj.id === projectId) {
-        const updatedTasks = [...(proj.tasks || []), newTask];
-        const updatedProj = { ...proj, tasks: updatedTasks };
-        updatedProj.progress = recalculateProgress(updatedProj);
-        return updatedProj;
+    try {
+      const response = await api.post(`/task/project/${projectId}`, {
+        title,
+        description,
+        priority,
+        dueDate,
+      });
+      if (response.data?.data?.task) {
+        const newTask = mapTask(response.data.data.task);
+        setProjects(prev => prev.map(proj => {
+          if (proj.id === projectId) {
+            const updatedTasks = [...(proj.tasks || []), newTask];
+            return { ...proj, tasks: updatedTasks };
+          }
+          return proj;
+        }));
+        fetchProjects(false);
+        return newTask;
       }
-      return proj;
-    });
-    
-    saveProjects(updated);
-    return newTask;
+    } catch (error) {
+      console.error('Failed to create task:', error);
+    }
   };
 
-  const updateTask = (projectId, taskId, taskData) => {
+  const updateTask = async (projectId, taskId, taskData) => {
     const { title, description, priority, dueDate } = taskData;
-    
-    const updated = projects.map(proj => {
-      if (proj.id === projectId) {
-        const updatedTasks = (proj.tasks || []).map(task => {
-          if (task.id === taskId) {
-            return {
-              ...task,
-              title,
-              description: description !== undefined ? description : task.description,
-              priority: priority !== undefined ? priority : task.priority,
-              dueDate: dueDate !== undefined ? dueDate : task.dueDate
-            };
+    try {
+      const response = await api.patch(`/task/${taskId}`, {
+        title,
+        description,
+        priority,
+        dueDate,
+      });
+      if (response.data?.data?.updatedTask) {
+        const updated = mapTask(response.data.data.updatedTask);
+        setProjects(prev => prev.map(proj => {
+          if (proj.id === projectId) {
+            const updatedTasks = (proj.tasks || []).map(task => 
+              task.id === taskId ? { ...task, ...updated } : task
+            );
+            return { ...proj, tasks: updatedTasks };
           }
-          return task;
-        });
-
-        const updatedProj = { ...proj, tasks: updatedTasks };
-        updatedProj.progress = recalculateProgress(updatedProj);
-        return updatedProj;
+          return proj;
+        }));
+        fetchProjects(false);
       }
-      return proj;
-    });
-
-    saveProjects(updated);
+    } catch (error) {
+      console.error('Failed to update task:', error);
+    }
   };
 
-  const deleteTask = (projectId, taskId) => {
-    const updated = projects.map(proj => {
-      if (proj.id === projectId) {
-        const updatedTasks = (proj.tasks || []).filter(task => task.id !== taskId);
-        const updatedProj = { ...proj, tasks: updatedTasks };
-        updatedProj.progress = recalculateProgress(updatedProj);
-        return updatedProj;
-      }
-      return proj;
-    });
-
-    saveProjects(updated);
+  const deleteTask = async (projectId, taskId) => {
+    try {
+      await api.delete(`/task/${taskId}`);
+      setProjects(prev => prev.map(proj => {
+        if (proj.id === projectId) {
+          const updatedTasks = (proj.tasks || []).filter(task => task.id !== taskId);
+          return { ...proj, tasks: updatedTasks };
+        }
+        return proj;
+      }));
+      fetchProjects(false);
+    } catch (error) {
+      console.error('Failed to delete task:', error);
+    }
   };
 
-  const toggleTaskStatus = (projectId, taskId) => {
-    const updated = projects.map(proj => {
-      if (proj.id === projectId) {
-        const updatedTasks = (proj.tasks || []).map(task => {
-          if (task.id === taskId) {
-            const nextCompleted = !task.completed;
-            // When task is toggled, toggle all its subtasks to match
-            const updatedSubtasks = (task.subtasks || []).map(sub => ({
-              ...sub,
-              completed: nextCompleted
-            }));
-
-            return {
-              ...task,
-              completed: nextCompleted,
-              subtasks: updatedSubtasks
-            };
+  const toggleTaskStatus = async (projectId, taskId) => {
+    try {
+      const response = await api.patch(`/task/${taskId}/toggle-status`);
+      if (response.data?.data) {
+        const updated = mapTask(response.data.data);
+        setProjects(prev => prev.map(proj => {
+          if (proj.id === projectId) {
+            const updatedTasks = (proj.tasks || []).map(task => {
+              if (task.id === taskId) {
+                // Toggle subtasks to match if we completed task
+                const updatedSubtasks = (task.subtasks || []).map(sub => ({
+                  ...sub,
+                  completed: updated.completed
+                }));
+                return {
+                  ...task,
+                  completed: updated.completed,
+                  subtasks: updatedSubtasks
+                };
+              }
+              return task;
+            });
+            return { ...proj, tasks: updatedTasks };
           }
-          return task;
-        });
-
-        const updatedProj = { ...proj, tasks: updatedTasks };
-        updatedProj.progress = recalculateProgress(updatedProj);
-        return updatedProj;
+          return proj;
+        }));
+        fetchProjects(false);
       }
-      return proj;
-    });
-
-    saveProjects(updated);
+    } catch (error) {
+      console.error('Failed to toggle task status:', error);
+    }
   };
 
   // ==========================================
   // SUBTASK OPERATIONS
   // ==========================================
 
-  const createSubTask = (projectId, taskId, title) => {
-    const newSubTask = {
-      id: `sub_${Date.now()}`,
-      title,
-      completed: false
-    };
-
-    const updated = projects.map(proj => {
-      if (proj.id === projectId) {
-        const updatedTasks = (proj.tasks || []).map(task => {
-          if (task.id === taskId) {
-            const updatedSub = [...(task.subtasks || []), newSubTask];
-            return {
-              ...task,
-              completed: false, // Adding an incomplete subtask means the task isn't fully completed
-              subtasks: updatedSub
-            };
-          }
-          return task;
-        });
-
-        const updatedProj = { ...proj, tasks: updatedTasks };
-        updatedProj.progress = recalculateProgress(updatedProj);
-        return updatedProj;
-      }
-      return proj;
-    });
-
-    saveProjects(updated);
-    return newSubTask;
-  };
-
-  const updateSubTask = (projectId, taskId, subTaskId, title) => {
-    const updated = projects.map(proj => {
-      if (proj.id === projectId) {
-        const updatedTasks = (proj.tasks || []).map(task => {
-          if (task.id === taskId) {
-            const updatedSub = (task.subtasks || []).map(sub => {
-              if (sub.id === subTaskId) {
-                return { ...sub, title };
+  const createSubTask = async (projectId, taskId, title) => {
+    try {
+      const response = await api.post(`/subTask/task/${taskId}`, { title });
+      if (response.data?.data?.subTask) {
+        const newSubTask = mapSubtask(response.data.data.subTask);
+        setProjects(prev => prev.map(proj => {
+          if (proj.id === projectId) {
+            const updatedTasks = (proj.tasks || []).map(task => {
+              if (task.id === taskId) {
+                const updatedSub = [...(task.subtasks || []), newSubTask];
+                return {
+                  ...task,
+                  completed: false,
+                  subtasks: updatedSub
+                };
               }
-              return sub;
+              return task;
             });
-            return { ...task, subtasks: updatedSub };
+            return { ...proj, tasks: updatedTasks };
           }
-          return task;
-        });
-
-        const updatedProj = { ...proj, tasks: updatedTasks };
-        updatedProj.progress = recalculateProgress(updatedProj);
-        return updatedProj;
+          return proj;
+        }));
+        fetchProjects(false);
+        return newSubTask;
       }
-      return proj;
-    });
-
-    saveProjects(updated);
+    } catch (error) {
+      console.error('Failed to create subtask:', error);
+    }
   };
 
-  const deleteSubTask = (projectId, taskId, subTaskId) => {
-    const updated = projects.map(proj => {
-      if (proj.id === projectId) {
-        const updatedTasks = (proj.tasks || []).map(task => {
-          if (task.id === taskId) {
-            const updatedSub = (task.subtasks || []).filter(sub => sub.id !== subTaskId);
-            // Check if remaining subtasks are all completed (to auto-complete the task)
-            const allCompleted = updatedSub.length > 0 && updatedSub.every(s => s.completed);
-            return {
-              ...task,
-              completed: allCompleted,
-              subtasks: updatedSub
-            };
-          }
-          return task;
-        });
-
-        const updatedProj = { ...proj, tasks: updatedTasks };
-        updatedProj.progress = recalculateProgress(updatedProj);
-        return updatedProj;
-      }
-      return proj;
-    });
-
-    saveProjects(updated);
-  };
-
-  const toggleSubTaskStatus = (projectId, taskId, subTaskId) => {
-    const updated = projects.map(proj => {
-      if (proj.id === projectId) {
-        const updatedTasks = (proj.tasks || []).map(task => {
-          if (task.id === taskId) {
-            const updatedSub = (task.subtasks || []).map(sub => {
-              if (sub.id === subTaskId) {
-                return { ...sub, completed: !sub.completed };
+  const updateSubTask = async (projectId, taskId, subTaskId, title) => {
+    try {
+      const response = await api.patch(`/subTask/${subTaskId}`, { title });
+      if (response.data?.data?.updatedSubTask) {
+        const updated = mapSubtask(response.data.data.updatedSubTask);
+        setProjects(prev => prev.map(proj => {
+          if (proj.id === projectId) {
+            const updatedTasks = (proj.tasks || []).map(task => {
+              if (task.id === taskId) {
+                const updatedSub = (task.subtasks || []).map(sub => 
+                  sub.id === subTaskId ? { ...sub, ...updated } : sub
+                );
+                return { ...task, subtasks: updatedSub };
               }
-              return sub;
+              return task;
             });
-
-            // If all subtasks are completed, the parent task is completed.
-            const allCompleted = updatedSub.length > 0 && updatedSub.every(s => s.completed);
-
-            return {
-              ...task,
-              completed: allCompleted,
-              subtasks: updatedSub
-            };
+            return { ...proj, tasks: updatedTasks };
           }
-          return task;
-        });
-
-        const updatedProj = { ...proj, tasks: updatedTasks };
-        updatedProj.progress = recalculateProgress(updatedProj);
-        return updatedProj;
+          return proj;
+        }));
+        fetchProjects(false);
       }
-      return proj;
-    });
+    } catch (error) {
+      console.error('Failed to update subtask:', error);
+    }
+  };
 
-    saveProjects(updated);
+  const deleteSubTask = async (projectId, taskId, subTaskId) => {
+    try {
+      await api.delete(`/subTask/${subTaskId}`);
+      setProjects(prev => prev.map(proj => {
+        if (proj.id === projectId) {
+          const updatedTasks = (proj.tasks || []).map(task => {
+            if (task.id === taskId) {
+              const updatedSub = (task.subtasks || []).filter(sub => sub.id !== subTaskId);
+              const allCompleted = updatedSub.length > 0 && updatedSub.every(s => s.completed);
+              return {
+                ...task,
+                completed: allCompleted,
+                subtasks: updatedSub
+              };
+            }
+            return task;
+          });
+          return { ...proj, tasks: updatedTasks };
+        }
+        return proj;
+      }));
+      fetchProjects(false);
+    } catch (error) {
+      console.error('Failed to delete subtask:', error);
+    }
+  };
+
+  const toggleSubTaskStatus = async (projectId, taskId, subTaskId) => {
+    try {
+      const response = await api.patch(`/subTask/${subTaskId}/toggle-status`);
+      if (response.data?.data) {
+        const updated = mapSubtask(response.data.data);
+        setProjects(prev => prev.map(proj => {
+          if (proj.id === projectId) {
+            const updatedTasks = (proj.tasks || []).map(task => {
+              if (task.id === taskId) {
+                const updatedSub = (task.subtasks || []).map(sub => 
+                  sub.id === subTaskId ? { ...sub, completed: updated.completed } : sub
+                );
+                const allCompleted = updatedSub.length > 0 && updatedSub.every(s => s.completed);
+                return {
+                  ...task,
+                  completed: allCompleted,
+                  subtasks: updatedSub
+                };
+              }
+              return task;
+            });
+            return { ...proj, tasks: updatedTasks };
+          }
+          return proj;
+        }));
+        fetchProjects(false);
+      }
+    } catch (error) {
+      console.error('Failed to toggle subtask status:', error);
+    }
   };
 
   return (
     <AppContext.Provider
       value={{
         projects,
+        isLoading,
+        fetchProjects,
         createProject,
         updateProject,
         deleteProject,

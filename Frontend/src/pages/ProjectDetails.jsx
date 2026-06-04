@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 import { useApp } from '../context/AppContext';
 import { TaskCard } from '../components/TaskCard';
 import { ProgressBar } from '../components/ProgressBar';
@@ -8,9 +10,9 @@ import { Modal } from '../components/Modal';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
 import { EmptyState } from '../components/EmptyState';
+import { Loader } from '../components/Loader';
 import { 
   ArrowLeft, 
-  Calendar, 
   CheckSquare, 
   Plus, 
   ListTodo,
@@ -22,6 +24,7 @@ export default function ProjectDetails() {
   const navigate = useNavigate();
   const { 
     projects, 
+    isLoading,
     createTask, 
     updateTask, 
     deleteTask, 
@@ -32,9 +35,6 @@ export default function ProjectDetails() {
     toggleSubTaskStatus
   } = useApp();
 
-  // Find corresponding project
-  const project = projects.find(p => p.id === projectId);
-
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All'); // 'All', 'Pending', 'Completed'
@@ -44,12 +44,75 @@ export default function ProjectDetails() {
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
 
-  // Form States
-  const [formTitle, setFormTitle] = useState('');
-  const [formDesc, setFormDesc] = useState('');
-  const [formPriority, setFormPriority] = useState('Medium');
-  const [formDueDate, setFormDueDate] = useState('');
-  const [formError, setFormError] = useState('');
+  // Find corresponding project
+  const project = projects.find(p => p.id === projectId);
+
+  // Formik form setup with Yup validation schema
+  const formik = useFormik({
+    enableReinitialize: true,
+    initialValues: {
+      title: editingTask ? editingTask.title : '',
+      description: editingTask ? (editingTask.description || '') : '',
+      priority: editingTask ? (editingTask.priority || 'Medium') : 'Medium',
+      dueDate: editingTask ? (editingTask.dueDate || '') : '',
+    },
+    validationSchema: Yup.object({
+      title: Yup.string()
+        .min(3, 'Task name must be at least 3 characters')
+        .required('Task name is required'),
+      description: Yup.string()
+        .max(500, 'Description cannot exceed 500 characters')
+        .optional(),
+      priority: Yup.string()
+        .oneOf(['Low', 'Medium', 'High'])
+        .required('Priority is required'),
+      dueDate: Yup.string().optional(),
+    }),
+    onSubmit: async (values) => {
+      const taskData = {
+        title: values.title.trim(),
+        description: values.description.trim(),
+        priority: values.priority,
+        dueDate: values.dueDate
+      };
+
+      if (editingTask) {
+        await updateTask(project.id, editingTask.id, taskData);
+      } else {
+        await createTask(project.id, taskData);
+      }
+
+      setIsTaskModalOpen(false);
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-24 animate-pulse mb-2" />
+        </div>
+        
+        {/* Project Banner Card Skeleton */}
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 shadow-premium p-6 sm:p-8 space-y-6 animate-pulse">
+          <div className="space-y-2">
+            <div className="h-6 bg-slate-200 dark:bg-slate-800 rounded w-1/3" />
+            <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-2/3" />
+          </div>
+          <div className="pt-4 border-t border-slate-50 dark:border-slate-800 grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+            <div className="md:col-span-2 h-4 bg-slate-100 dark:bg-slate-850 rounded w-full" />
+            <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/3 justify-self-end" />
+          </div>
+        </div>
+
+        {/* Filters Toolbar Skeleton */}
+        <div className="h-16 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl animate-pulse" />
+
+        {/* Task Rows Skeletons */}
+        <Loader type="row-skeleton" count={4} />
+      </div>
+    );
+  }
 
   if (!project) {
     return (
@@ -65,47 +128,13 @@ export default function ProjectDetails() {
 
   const handleOpenCreateModal = () => {
     setEditingTask(null);
-    setFormTitle('');
-    setFormDesc('');
-    setFormPriority('Medium');
-    setFormDueDate('');
-    setFormError('');
+    formik.resetForm();
     setIsTaskModalOpen(true);
   };
 
   const handleOpenEditModal = (task) => {
     setEditingTask(task);
-    setFormTitle(task.title);
-    setFormDesc(task.description || '');
-    setFormPriority(task.priority || 'Medium');
-    setFormDueDate(task.dueDate || '');
-    setFormError('');
     setIsTaskModalOpen(true);
-  };
-
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
-    setFormError('');
-
-    if (!formTitle.trim()) {
-      setFormError('Task title is required.');
-      return;
-    }
-
-    const taskData = {
-      title: formTitle.trim(),
-      description: formDesc.trim(),
-      priority: formPriority,
-      dueDate: formDueDate
-    };
-
-    if (editingTask) {
-      updateTask(project.id, editingTask.id, taskData);
-    } else {
-      createTask(project.id, taskData);
-    }
-
-    setIsTaskModalOpen(false);
   };
 
   const handleDeleteTask = (taskId) => {
@@ -158,7 +187,7 @@ export default function ProjectDetails() {
       <div>
         <Link 
           to="/dashboard/projects"
-          className="inline-flex items-center gap-1 text-xs font-bold text-slate-400 dark:text-slate-500 hover:text-slate-655 dark:hover:text-slate-300 transition-colors uppercase tracking-wider mb-2"
+          className="inline-flex items-center gap-1 text-xs font-bold text-slate-400 dark:text-slate-500 hover:text-slate-655 dark:hover:text-slate-350 transition-colors uppercase tracking-wider mb-2"
         >
           <ArrowLeft className="w-3.5 h-3.5" /> Back to Projects
         </Link>
@@ -171,7 +200,7 @@ export default function ProjectDetails() {
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight font-display">
               {project.title}
             </h1>
-            <p className="text-sm text-slate-500 dark:text-slate-405 leading-relaxed">
+            <p className="text-sm text-slate-500 dark:text-slate-450 leading-relaxed">
               {project.description || "No description provided for this project. Double click 'Edit Project' on the list view to add a summary."}
             </p>
           </div>
@@ -279,32 +308,38 @@ export default function ProjectDetails() {
         onClose={() => setIsTaskModalOpen(false)}
         title={editingTask ? "Edit Task" : "Create New Task"}
       >
-        <form onSubmit={handleFormSubmit} className="space-y-4">
+        <form onSubmit={formik.handleSubmit} className="space-y-4">
           <Input
             label="Task Name"
             type="text"
             placeholder="e.g. Implement user login form"
-            value={formTitle}
-            onChange={(e) => setFormTitle(e.target.value)}
-            error={formError}
-            required
-            autoFocus
+            name="title"
+            value={formik.values.title}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.title && formik.errors.title}
           />
 
           <Input
             label="Task Description"
             type="textarea"
             placeholder="Describe the task parameters, requirements, or links..."
-            value={formDesc}
-            onChange={(e) => setFormDesc(e.target.value)}
+            name="description"
+            value={formik.values.description}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.description && formik.errors.description}
           />
 
           <div className="grid grid-cols-2 gap-4">
             <Input
               label="Priority"
               type="select"
-              value={formPriority}
-              onChange={(e) => setFormPriority(e.target.value)}
+              name="priority"
+              value={formik.values.priority}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.priority && formik.errors.priority}
               options={[
                 { value: 'Low', label: 'Low' },
                 { value: 'Medium', label: 'Medium' },
@@ -315,13 +350,16 @@ export default function ProjectDetails() {
             <Input
               label="Due Date"
               type="date"
-              value={formDueDate}
-              onChange={(e) => setFormDueDate(e.target.value)}
+              name="dueDate"
+              value={formik.values.dueDate}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.dueDate && formik.errors.dueDate}
             />
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t border-slate-50 dark:border-slate-800">
-            <Button variant="outline" onClick={() => setIsTaskModalOpen(false)}>
+            <Button variant="outline" type="button" onClick={() => setIsTaskModalOpen(false)}>
               Cancel
             </Button>
             <Button type="submit">

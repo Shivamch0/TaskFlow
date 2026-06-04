@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useFormik } from 'formik'
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 import { useAuth } from '../context/AuthContext';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
@@ -9,44 +10,33 @@ import { AlertCircle } from 'lucide-react';
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
-
-  const { values , handleChange , handleSubmit} = useFormik({
-    initialValues : {
-      email : '',
-      password : ''
-    },
-    onSubmit : async (values) => {
-
-    }
-  })
-
-  // const [email, setEmail] = useState('');
-  // const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   setError('');
-
-  //   if (!email || !password) {
-  //     setError('Please fill in all fields');
-  //     return;
-  //   }
-
-  //   setIsLoading(true);
-
-  //   // Simulate small latency for premium feel
-  //   setTimeout(() => {
-  //     const res = login(email, password);
-  //     setIsLoading(false);
-  //     if (res.success) {
-  //       navigate('/dashboard');
-  //     } else {
-  //       setError(res.message || 'Invalid credentials');
-  //     }
-  //   }, 600);
-  // };
+  const formik = useFormik({
+    initialValues: {
+      email: '',
+      password: '',
+    },
+    validationSchema: Yup.object({
+      email: Yup.string()
+        .email('Invalid email address')
+        .required('Email is required'),
+      password: Yup.string()
+        .required('Password is required'),
+    }),
+    onSubmit: async (values) => {
+      setError('');
+      setIsLoading(true);
+      const res = await login(values.email, values.password);
+      setIsLoading(false);
+      if (res.success) {
+        navigate('/dashboard');
+      } else {
+        setError(res.message || 'Invalid credentials');
+      }
+    },
+  });
 
   return (
     <div className="space-y-6">
@@ -69,25 +59,27 @@ export default function Login() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={formik.handleSubmit} className="space-y-4">
         <Input
           label="Email Address"
           type="email"
           placeholder="you@example.com"
-          name='email'
-          value={values.email}
-          onChange={handleChange}
-          required
+          name="email"
+          value={formik.values.email}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          error={formik.touched.email && formik.errors.email}
         />
 
         <Input
           label="Password"
           type="password"
           placeholder="••••••••"
-          name='password'
-          value={values.password}
-          onChange={handleChange}
-          required
+          name="password"
+          value={formik.values.password}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          error={formik.touched.password && formik.errors.password}
         />
 
         <Button

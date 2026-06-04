@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
 import { Input } from '../components/Input';
@@ -17,8 +19,6 @@ export default function Profile() {
   const { currentUser, updateProfile } = useAuth();
   const { projects } = useApp();
 
-  const [name, setName] = useState(currentUser?.name || '');
-  const [avatar, setAvatar] = useState(currentUser?.avatar || '');
   const [isEditing, setIsEditing] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
 
@@ -30,24 +30,42 @@ export default function Profile() {
   const pendingTasks = totalTasks - completedTasks;
   const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
-  const handleSave = (e) => {
-    e.preventDefault();
-    if (name.trim()) {
-      updateProfile(name.trim(), avatar.trim());
-      setIsEditing(false);
-      setIsSaved(true);
-      setTimeout(() => setIsSaved(false), 3000);
-    }
-  };
+  // Formik form setup
+  const formik = useFormik({
+    enableReinitialize: true,
+    initialValues: {
+      name: currentUser?.name || '',
+      avatar: currentUser?.avatar || '',
+    },
+    validationSchema: Yup.object({
+      name: Yup.string()
+        .min(2, 'Name must be at least 2 characters')
+        .required('Display Name is required'),
+      avatar: Yup.string()
+        .url('Must be a valid URL')
+        .optional()
+        .nullable(),
+    }),
+    onSubmit: async (values) => {
+      const res = await updateProfile(values.name.trim(), values.avatar.trim());
+      if (res.success) {
+        setIsEditing(false);
+        setIsSaved(true);
+        setTimeout(() => setIsSaved(false), 3000);
+      }
+    },
+  });
 
-  const handleRegenerateAvatar = () => {
-    // Generate a random seed based on current timestamp
+  const handleRegenerateAvatar = async () => {
     const randomSeed = Math.random().toString(36).substring(7);
     const newAvatar = `https://api.dicebear.com/7.x/adventurer/svg?seed=${randomSeed}`;
-    setAvatar(newAvatar);
+    
+    await formik.setFieldValue('avatar', newAvatar);
     if (!isEditing) {
-      // If not in editing mode, update immediately
-      updateProfile(name, newAvatar);
+      // If not in editing mode, update immediately in the backend
+      await updateProfile(formik.values.name || currentUser?.name, newAvatar);
+      setIsSaved(true);
+      setTimeout(() => setIsSaved(false), 3000);
     }
   };
 
@@ -58,7 +76,7 @@ export default function Profile() {
         <h1 className="text-2xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight font-display">
           User Profile
         </h1>
-        <p className="text-sm text-slate-400 dark:text-slate-500 font-medium">
+        <p className="text-sm text-slate-400 dark:text-slate-550 font-medium">
           Manage your personal account settings, avatars, and review workspace activity.
         </p>
       </div>
@@ -71,7 +89,7 @@ export default function Profile() {
             {/* Avatar display */}
             <div className="relative group mb-4">
               <img 
-                src={avatar || 'https://api.dicebear.com/7.x/adventurer/svg'} 
+                src={formik.values.avatar || 'https://api.dicebear.com/7.x/adventurer/svg'} 
                 alt={currentUser?.name} 
                 className="w-28 h-28 rounded-full border-2 border-indigo-500 bg-slate-50 dark:bg-slate-800 object-cover shadow-sm p-1 transition-all duration-300 group-hover:scale-105"
               />
@@ -99,19 +117,24 @@ export default function Profile() {
             )}
 
             {isEditing ? (
-              <form onSubmit={handleSave} className="w-full space-y-4 text-left">
+              <form onSubmit={formik.handleSubmit} className="w-full space-y-4 text-left">
                 <Input
                   label="Display Name"
                   type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
+                  name="name"
+                  value={formik.values.name}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.name && formik.errors.name}
                 />
                 <Input
                   label="Avatar Image URL"
                   type="text"
-                  value={avatar}
-                  onChange={(e) => setAvatar(e.target.value)}
+                  name="avatar"
+                  value={formik.values.avatar}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.avatar && formik.errors.avatar}
                   placeholder="https://example.com/avatar.jpg"
                 />
                 
@@ -119,7 +142,7 @@ export default function Profile() {
                   <Button type="submit" size="sm" className="flex-1">
                     Save Changes
                   </Button>
-                  <Button variant="outline" size="sm" onClick={() => setIsEditing(false)}>
+                  <Button variant="outline" type="button" size="sm" onClick={() => setIsEditing(false)}>
                     Cancel
                   </Button>
                 </div>
@@ -178,20 +201,20 @@ export default function Profile() {
             {/* Micro Details list */}
             <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-4">
               <h4 className="text-xs font-bold text-slate-550 dark:text-slate-500 uppercase tracking-wider">Account Metrics Details</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm font-semibold text-slate-650 dark:text-slate-400">
-                <div className="flex justify-between p-3 bg-slate-50/50 dark:bg-slate-850/50 rounded-lg border border-slate-50 dark:border-slate-800">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm font-semibold text-slate-600 dark:text-slate-400">
+                <div className="flex justify-between p-3 bg-slate-50/50 dark:bg-slate-850/50 rounded-lg border border-slate-55 dark:border-slate-800">
                   <span>Total Tasks:</span>
                   <span className="text-slate-800 dark:text-slate-205 font-bold">{totalTasks}</span>
                 </div>
-                <div className="flex justify-between p-3 bg-slate-50/50 dark:bg-slate-850/50 rounded-lg border border-slate-50 dark:border-slate-800">
+                <div className="flex justify-between p-3 bg-slate-50/50 dark:bg-slate-850/50 rounded-lg border border-slate-55 dark:border-slate-800">
                   <span>Pending Tasks:</span>
                   <span className="text-slate-800 dark:text-slate-205 font-bold">{pendingTasks}</span>
                 </div>
-                <div className="flex justify-between p-3 bg-slate-50/50 dark:bg-slate-850/50 rounded-lg border border-slate-50 dark:border-slate-800">
+                <div className="flex justify-between p-3 bg-slate-50/50 dark:bg-slate-850/50 rounded-lg border border-slate-55 dark:border-slate-800">
                   <span>Registered Account Email:</span>
                   <span className="text-slate-800 dark:text-slate-205 font-bold truncate max-w-[200px]" title={currentUser?.email}>{currentUser?.email}</span>
                 </div>
-                <div className="flex justify-between p-3 bg-slate-50/50 dark:bg-slate-850/50 rounded-lg border border-slate-50 dark:border-slate-800">
+                <div className="flex justify-between p-3 bg-slate-50/50 dark:bg-slate-850/50 rounded-lg border border-slate-55 dark:border-slate-800">
                   <span>Account Level Badge:</span>
                   <span className="text-indigo-600 dark:text-indigo-400 font-bold uppercase text-xs tracking-wider">
                     {completionRate > 80 ? 'Master Planner' : completionRate > 50 ? 'Workspace Expert' : 'Regular User'}

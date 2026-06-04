@@ -15,9 +15,78 @@ import {
 } from 'lucide-react';
 
 export default function Dashboard() {
-  const { projects, toggleTaskStatus } = useApp();
+  const { projects, isLoading, toggleTaskStatus } = useApp();
   const { currentUser } = useAuth();
   const navigate = useNavigate();
+
+  if (isLoading) {
+    return (
+      <div className="space-y-8">
+        {/* Welcome header skeleton */}
+        <div className="space-y-2 animate-pulse">
+          <div className="h-8 bg-slate-200 dark:bg-slate-800 rounded w-1/3" />
+          <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/4" />
+        </div>
+
+        {/* Stats card skeleton grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {Array.from({ length: 4 }).map((_, idx) => (
+            <div key={idx} className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-100 dark:border-slate-800 shadow-premium animate-pulse flex items-start gap-4">
+              <div className="w-10 h-10 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+              <div className="space-y-2 flex-1">
+                <div className="h-3 bg-slate-200 dark:bg-slate-800 rounded w-2/3" />
+                <div className="h-6 bg-slate-200 dark:bg-slate-800 rounded w-1/2" />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Dashboard contents split grid skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            {/* Chart container skeleton */}
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-100 dark:border-slate-800 shadow-premium animate-pulse h-64 flex flex-col justify-between">
+              <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/4" />
+              <div className="flex gap-4 items-end h-40">
+                {Array.from({ length: 7 }).map((_, idx) => (
+                  <div key={idx} className="flex-1 bg-slate-200 dark:bg-slate-800 rounded-lg h-[60%]" style={{ height: `${[40, 65, 50, 80, 95, 30, 45][idx]}%` }} />
+                ))}
+              </div>
+            </div>
+
+            {/* Recent Tasks list skeleton */}
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-100 dark:border-slate-800 shadow-premium animate-pulse space-y-4">
+              <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/4" />
+              {Array.from({ length: 3 }).map((_, idx) => (
+                <div key={idx} className="flex items-center gap-3">
+                  <div className="w-5 h-5 bg-slate-200 dark:bg-slate-800 rounded" />
+                  <div className="flex-1 space-y-1">
+                    <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/3" />
+                    <div className="h-3 bg-slate-200 dark:bg-slate-800 rounded w-1/4" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right column skeleton */}
+          <div className="space-y-6">
+            <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/3 animate-pulse" />
+            {Array.from({ length: 2 }).map((_, idx) => (
+              <div key={idx} className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-100 dark:border-slate-800 shadow-premium animate-pulse space-y-4">
+                <div className="flex justify-between">
+                  <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/2" />
+                  <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/6" />
+                </div>
+                <div className="h-3 bg-slate-200 dark:bg-slate-800 rounded w-5/6" />
+                <div className="h-2 bg-slate-100 dark:bg-slate-850 rounded w-full" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Calculate metrics
   const totalProjects = projects.length;

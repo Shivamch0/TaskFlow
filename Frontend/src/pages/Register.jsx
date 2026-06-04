@@ -1,71 +1,51 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useFormik } from "formik"
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 import { useAuth } from '../context/AuthContext';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
 import { AlertCircle } from 'lucide-react';
-import { registerUser } from '../axios/api/auth.api.js';
 
 export default function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
-  const { values , handleSubmit , handleChange } = useFormik({
-    initialValues : {
-      name : "",
-      email : '',
-      password : '',
-      confirmPassword : ''
-    },
-    onSubmit : async (values) => {
-      console.log(values)
-      const res = await register(values);
-
-      console.log(res)
-      console.log("user registered...")
-    }
-  })
-
-  // const [name, setName] = useState('');
-  // const [email, setEmail] = useState('');
-  // const [password, setPassword] = useState('');
-  // const [confirmPassword, setConfirmPassword] = useState('');
-  
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   setError('');
-
-  //   if (!name || !email || !password || !confirmPassword) {
-  //     setError('Please fill in all fields');
-  //     return;
-  //   }
-
-  //   if (password !== confirmPassword) {
-  //     setError('Passwords do not match');
-  //     return;
-  //   }
-
-  //   if (password.length < 6) {
-  //     setError('Password must be at least 6 characters long');
-  //     return;
-  //   }
-
-  //   setIsLoading(true);
-
-  //   // Simulate small latency for premium feel
-  //   setTimeout(() => {
-  //     const res = register(name, email, password);
-  //     setIsLoading(false);
-  //     if (res.success) {
-  //       navigate('/dashboard');
-  //     } else {
-  //       setError(res.message || 'Registration failed');
-  //     }
-  //   }, 600);
-  // };
+  const formik = useFormik({
+    initialValues: {
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
+    validationSchema: Yup.object({
+      name: Yup.string()
+        .min(2, 'Name must be at least 2 characters')
+        .required('Full Name is required'),
+      email: Yup.string()
+        .email('Invalid email address')
+        .required('Email is required'),
+      password: Yup.string()
+        .min(6, 'Password must be at least 6 characters')
+        .required('Password is required'),
+      confirmPassword: Yup.string()
+        .oneOf([Yup.ref('password'), null], 'Passwords must match')
+        .required('Confirm Password is required'),
+    }),
+    onSubmit: async (values) => {
+      setError('');
+      setIsLoading(true);
+      const res = await register(values.name, values.email, values.password);
+      setIsLoading(false);
+      if (res.success) {
+        navigate('/dashboard');
+      } else {
+        setError(res.message || 'Registration failed');
+      }
+    },
+  });
 
   return (
     <div className="space-y-6">
@@ -88,15 +68,16 @@ export default function Register() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={formik.handleSubmit} className="space-y-4">
         <Input
           label="Full Name"
           type="text"
           placeholder="John Doe"
           name="name"
-          value={values.name}
-          onChange={handleChange}
-          required
+          value={formik.values.name}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          error={formik.touched.name && formik.errors.name}
         />
 
         <Input
@@ -104,19 +85,21 @@ export default function Register() {
           type="email"
           placeholder="you@example.com"
           name="email"
-          value={values.email}
-          onChange={handleChange}
-          required
+          value={formik.values.email}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          error={formik.touched.email && formik.errors.email}
         />
 
         <Input
           label="Password"
           type="password"
           placeholder="••••••••"
-          name='password'
-          value={values.password}
-          onChange={handleChange}
-          required
+          name="password"
+          value={formik.values.password}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          error={formik.touched.password && formik.errors.password}
         />
 
         <Input
@@ -124,9 +107,10 @@ export default function Register() {
           type="password"
           placeholder="••••••••"
           name="confirmPassword"
-          value={values.confirmPassword}
-          onChange={handleChange}
-          required
+          value={formik.values.confirmPassword}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          error={formik.touched.confirmPassword && formik.errors.confirmPassword}
         />
 
         <Button
