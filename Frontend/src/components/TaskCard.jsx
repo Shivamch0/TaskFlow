@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { 
   Calendar, 
   ChevronDown, 
@@ -8,7 +8,6 @@ import {
   Check, 
   Plus, 
   ListTodo,
-  AlertCircle,
   X
 } from 'lucide-react';
 import { SubTaskItem } from './SubTaskItem';

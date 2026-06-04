@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Check, Edit2, Trash2, X, CheckSquare, Square } from 'lucide-react';
+import { useState } from 'react';
+import { Check, Edit2, Trash2, X } from 'lucide-react';
 
 export function SubTaskItem({ subtask, onToggle, onEdit, onDelete }) {
   const [isEditing, setIsEditing] = useState(false);

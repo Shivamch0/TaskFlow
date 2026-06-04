@@ -6,6 +6,7 @@ import { SubTask } from "../model/subtask.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { validateObjectId } from "../utils/validateObjectId.js";
 
 const createProject = asyncHandler(async (req , res) => {
     const {title , description } = req.body;
@@ -59,9 +60,7 @@ const getProjects = asyncHandler(async (req , res) => {
 
 const getProjectById = asyncHandler(async (req , res) => {
     const projectId = req.params.id;
-    if(!projectId){
-        throw new ApiError(404 , "Project Id not found...")
-    }
+    validateObjectId(projectId, "Project Id");
     const user = req.user._id;
     
     const project = await Project.findById(projectId).lean();
@@ -122,9 +121,7 @@ const getProjectById = asyncHandler(async (req , res) => {
 
 const updateProject = asyncHandler(async (req , res) => {
     const projectId = req.params.id;
-     if(!projectId){
-        throw new ApiError(404 , "Project Id not found...")
-    }
+    validateObjectId(projectId, "Project Id");
     const user = req.user._id;
     const { title , description} = req.body;
 
@@ -151,9 +148,7 @@ const updateProject = asyncHandler(async (req , res) => {
 
 const deleteProject = asyncHandler(async (req , res) => {
     const projectId = req.params.id;
-     if(!projectId){
-        throw new ApiError(404 , "Project Id not found...")
-    }
+    validateObjectId(projectId, "Project Id");
     const user = req.user._id;
 
     const project = await Project.findById(projectId);
@@ -164,6 +159,11 @@ const deleteProject = asyncHandler(async (req , res) => {
         throw new ApiError(403 , "You are not authorized to delete this project...")
     }
 
+    const tasks = await Task.find({ project: projectId }).select("_id");
+    const taskIds = tasks.map((task) => task._id);
+
+    await SubTask.deleteMany({ task: { $in: taskIds } });
+    await Task.deleteMany({ project: projectId });
     await Project.findByIdAndDelete(projectId);
 
     return res.status(200).json(new ApiResponse(200 , {} , "Deleted Project successfully..."))

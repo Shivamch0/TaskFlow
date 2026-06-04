@@ -1,11 +1,10 @@
 import { Task } from "../model/task.model.js";
 import { Project } from "../model/project.model.js";
 import { ApiError } from "../utils/ApiError.js";
+import { validateObjectId } from "../utils/validateObjectId.js";
 
 export const validateTask = async (taskId, userId) => {
-  if (!taskId) {
-    throw new ApiError(404, "Task Id not found...");
-  }
+  validateObjectId(taskId, "Task Id");
 
   const task = await Task.findById(taskId);
 

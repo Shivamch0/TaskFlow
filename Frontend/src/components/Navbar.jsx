@@ -1,4 +1,3 @@
-import React from 'react';
 import { Menu, Calendar, Sun, Moon } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';

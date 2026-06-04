@@ -1,10 +1,9 @@
 import { Project } from "../model/project.model.js";
 import { ApiError } from "../utils/ApiError.js";
+import { validateObjectId } from "../utils/validateObjectId.js";
 
 export const validateProject = async (projectId, userId) => {
-  if (!projectId) {
-    throw new ApiError(404, "Project Id not found...");
-  }
+  validateObjectId(projectId, "Project Id");
 
   const project = await Project.findById(projectId);
 

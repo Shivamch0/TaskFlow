@@ -1,4 +1,3 @@
-import React from 'react';
 
 export function Loader({ type = 'spinner', count = 3, className = '' }) {
   if (type === 'spinner') {

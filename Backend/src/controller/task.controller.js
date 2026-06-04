@@ -1,4 +1,5 @@
 import { Task } from "../model/task.model.js";
+import { SubTask } from "../model/subtask.model.js";
 
 //! Helper Imports
 import { validateProject } from "../helpers/project.helper.js";
@@ -96,6 +97,7 @@ const deleteTask = asyncHandler(async (req, res) => {
 
   const task = await validateTask(taskId, req.user._id);
 
+  await SubTask.deleteMany({ task: task._id });
   await Task.findByIdAndDelete(task._id);
 
   return res
@@ -113,6 +115,7 @@ const toggleTaskStatus = asyncHandler(async (req, res) => {
 
   task.completed = !task.completed;
   await task.save();
+  await SubTask.updateMany({ task: task._id }, { $set: { completed: task.completed } });
 
   return res
     .status(200)

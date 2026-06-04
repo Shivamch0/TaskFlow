@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { 
@@ -25,15 +25,15 @@ export default function Landing() {
   const faqs = [
     {
       q: "Is TaskFlow really free?",
-      a: "Yes! TaskFlow is a frontend-only project management application that runs completely in your browser. There are no fees or registration requirements for the basic sandbox."
+      a: "Yes! TaskFlow is free to use for personal project and task management. Create an account, sign in, and manage your workspace through the connected backend."
     },
     {
       q: "Where is my project data stored?",
-      a: "Your data is stored securely in your browser's Local Storage database. It never leaves your computer, meaning your workspace is completely private."
+      a: "Your project data is stored in MongoDB through the TaskFlow API. Authentication uses secure HTTP-only cookies for session handling."
     },
     {
-      q: "Can I connect a backend server later?",
-      a: "Absolutely. TaskFlow's codebase is architected to match modern Mongoose schemas (Users, Projects, Tasks, Subtasks). Connecting an API using axios or fetch in the future is straightforward."
+      q: "Does TaskFlow include a backend server?",
+      a: "Yes. The app includes an Express and Mongoose API for users, projects, tasks, and subtasks, with Axios used on the frontend."
     },
     {
       q: "Does it support mobile devices?",
@@ -108,7 +108,7 @@ export default function Landing() {
           </h1>
 
           <p className="text-slate-505 dark:text-slate-400 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed font-medium">
-            Plan, organize, and track your projects, tasks, and collapsible subtasks effortlessly. A clean, beautiful local workspace designed to elevate your daily productivity.
+            Plan, organize, and track your projects, tasks, and collapsible subtasks effortlessly. A clean workspace designed to elevate your daily productivity.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
@@ -240,7 +240,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Local Storage Banner */}
+      {/* Data Security Banner */}
       <section className="bg-white dark:bg-slate-900 border-y border-slate-100 dark:border-slate-800 py-16 px-6 transition-colors">
         <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex items-start gap-4">
@@ -248,9 +248,9 @@ export default function Landing() {
               <ShieldCheck className="w-8 h-8" />
             </div>
             <div className="space-y-1.5">
-              <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 font-display">Protected by Local Storage</h3>
+              <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 font-display">Protected Workspace Data</h3>
               <p className="text-sm text-slate-505 dark:text-slate-400 leading-relaxed">
-                TaskFlow operates in your browser's sandboxed local database. No cloud data leakage, no corporate trackers. Your private project plans stay on your local disk.
+                TaskFlow keeps your workspace behind authenticated API routes and HTTP-only session cookies, with project data persisted through MongoDB.
               </p>
             </div>
           </div>
@@ -279,7 +279,7 @@ export default function Landing() {
               <ul className="text-xs text-slate-505 dark:text-slate-400 space-y-2.5 pt-4">
                 <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-emerald-500" /> Unlimited Projects</li>
                 <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-emerald-500" /> Unlimited Tasks & Subtasks</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-emerald-500" /> Local Storage Database</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-emerald-500" /> MongoDB-backed Workspace</li>
                 <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-emerald-500" /> SVG Productivity Analytics</li>
               </ul>
             </div>

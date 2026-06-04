@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, CheckSquare, Edit, Trash2, ArrowRight } from 'lucide-react';
 import { ProgressBar } from './ProgressBar';

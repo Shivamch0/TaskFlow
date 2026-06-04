@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import api from '../axios/axios';
 
@@ -57,9 +57,38 @@ export function AppProvider({ children }) {
     }
   };
 
+  const fetchProjectById = async (projectId, showLoading = true) => {
+    if (!currentUser || !projectId) {
+      return null;
+    }
+    if (showLoading) setIsLoading(true);
+    try {
+      const response = await api.get(`/project/${projectId}`);
+      if (response.data?.data) {
+        const mappedProject = mapProject(response.data.data);
+        setProjects(prev => {
+          const exists = prev.some(project => project.id === mappedProject.id);
+          if (exists) {
+            return prev.map(project => project.id === mappedProject.id ? mappedProject : project);
+          }
+          return [mappedProject, ...prev];
+        });
+        return mappedProject;
+      }
+      return null;
+    } catch (error) {
+      console.error('Failed to fetch project:', error);
+      return null;
+    } finally {
+      if (showLoading) setIsLoading(false);
+    }
+  };
+
   // Trigger projects loading when user logs in/changes
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchProjects(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
 
   // ==========================================
@@ -87,7 +116,7 @@ export function AppProvider({ children }) {
       if (response.data?.data) {
         const updated = mapProject(response.data.data);
         setProjects(prev => prev.map(p => p.id === projectId ? { ...p, ...updated } : p));
-        fetchProjects(false);
+        fetchProjectById(projectId, false);
       }
     } catch (error) {
       console.error('Failed to update project:', error);
@@ -125,7 +154,7 @@ export function AppProvider({ children }) {
           }
           return proj;
         }));
-        fetchProjects(false);
+        fetchProjectById(projectId, false);
         return newTask;
       }
     } catch (error) {
@@ -153,7 +182,7 @@ export function AppProvider({ children }) {
           }
           return proj;
         }));
-        fetchProjects(false);
+        fetchProjectById(projectId, false);
       }
     } catch (error) {
       console.error('Failed to update task:', error);
@@ -170,7 +199,7 @@ export function AppProvider({ children }) {
         }
         return proj;
       }));
-      fetchProjects(false);
+      fetchProjectById(projectId, false);
     } catch (error) {
       console.error('Failed to delete task:', error);
     }
@@ -202,7 +231,7 @@ export function AppProvider({ children }) {
           }
           return proj;
         }));
-        fetchProjects(false);
+        fetchProjectById(projectId, false);
       }
     } catch (error) {
       console.error('Failed to toggle task status:', error);
@@ -235,7 +264,7 @@ export function AppProvider({ children }) {
           }
           return proj;
         }));
-        fetchProjects(false);
+        fetchProjectById(projectId, false);
         return newSubTask;
       }
     } catch (error) {
@@ -263,7 +292,7 @@ export function AppProvider({ children }) {
           }
           return proj;
         }));
-        fetchProjects(false);
+        fetchProjectById(projectId, false);
       }
     } catch (error) {
       console.error('Failed to update subtask:', error);
@@ -291,7 +320,7 @@ export function AppProvider({ children }) {
         }
         return proj;
       }));
-      fetchProjects(false);
+      fetchProjectById(projectId, false);
     } catch (error) {
       console.error('Failed to delete subtask:', error);
     }
@@ -322,7 +351,7 @@ export function AppProvider({ children }) {
           }
           return proj;
         }));
-        fetchProjects(false);
+        fetchProjectById(projectId, false);
       }
     } catch (error) {
       console.error('Failed to toggle subtask status:', error);
@@ -335,6 +364,7 @@ export function AppProvider({ children }) {
         projects,
         isLoading,
         fetchProjects,
+        fetchProjectById,
         createProject,
         updateProject,
         deleteProject,
@@ -353,6 +383,7 @@ export function AppProvider({ children }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useApp() {
   const context = useContext(AppContext);
   if (!context) {

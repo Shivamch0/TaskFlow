@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useAuth } from '../context/AuthContext';
@@ -6,8 +6,6 @@ import { useApp } from '../context/AppContext';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
 import { 
-  User, 
-  Mail, 
   Sparkles, 
   FolderKanban, 
   CheckCircle2, 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { BarChart3, TrendingUp, CheckCircle, PieChart, Sparkles, Award } from 'lucide-react';
 import { ProgressBar } from '../components/ProgressBar';

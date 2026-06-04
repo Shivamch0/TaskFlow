@@ -168,7 +168,16 @@ const refreshAccessToken = asyncHandler(async (req , res) => {
         ),
       );
     }catch(error){
-        console.log(error)
+        if (error instanceof ApiError) {
+          throw error;
+        }
+        if (error.name === "TokenExpiredError") {
+          throw new ApiError(401, "Refresh Token is expired...");
+        }
+        if (error.name === "JsonWebTokenError") {
+          throw new ApiError(401, "Invalid refresh token...");
+        }
+        throw new ApiError(401, "Unable to refresh access token...");
     }
 });
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -51,21 +51,23 @@ export default function Projects() {
     },
   });
 
-  // Handle URL query parameter `?create=true`
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    if (params.get('create') === 'true') {
-      handleOpenCreateModal();
-      // Clear query params to prevent reopening on reload
-      navigate('/dashboard/projects', { replace: true });
-    }
-  }, [location, navigate]);
-
   const handleOpenCreateModal = () => {
     setEditingProject(null);
     formik.resetForm();
     setIsModalOpen(true);
   };
+
+  // Handle URL query parameter `?create=true`
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('create') === 'true') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      handleOpenCreateModal();
+      // Clear query params to prevent reopening on reload
+      navigate('/dashboard/projects', { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location, navigate]);
 
   const handleOpenEditModal = (project) => {
     setEditingProject(project);

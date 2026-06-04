@@ -215,12 +215,8 @@ dist/assets/index-*.js        532.05 kB
 
 ## Improvement Backlog
 
-- Use `GET /project/:id` on the project details page so direct refreshes can load the selected project with its tasks and subtasks.
-- Adjust refresh-token handling so `/user/refresh-token` can work when the access token is expired.
-- Return an error response from `refreshAccessToken` instead of only logging caught errors.
-- Cascade deletes so deleting a project removes its tasks/subtasks, and deleting a task removes its subtasks.
-- Keep task and subtask completion behavior consistent between frontend optimistic updates and backend persistence.
-- Update landing page FAQ copy so it describes the current MongoDB/API-backed app instead of a frontend-only local-storage app.
-- Add backend validation for object IDs and request body limits beyond basic required-field checks.
 - Add automated tests for auth, project ownership, task/subtask CRUD, and progress calculation.
-- Add a root `.gitignore` if the repo will be managed as one combined project.
+- Add stricter backend request validation for field lengths, allowed values, and dates.
+- Add user-facing frontend error states for failed project/task/subtask actions.
+- Consider extracting project, task, and subtask API calls into dedicated service modules if the contexts keep growing.
+- Add pagination or aggregation endpoints if project lists become large.

@@ -1,9 +1,7 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
 import { StatsCard } from '../components/StatsCard';
-import { ProjectCard } from '../components/ProjectCard';
 import { 
   FolderKanban, 
   CheckCircle2, 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
@@ -6,9 +6,7 @@ import {
   Bell, 
   Palette, 
   ShieldCheck, 
-  Lock, 
-  HelpCircle,
-  Sparkles
+  Lock
 } from 'lucide-react';
 
 export default function Settings() {

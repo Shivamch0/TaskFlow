@@ -2,11 +2,10 @@ import { SubTask } from "../model/subtask.model.js";
 import { Task } from "../model/task.model.js";
 import { Project } from "../model/project.model.js";
 import { ApiError } from "../utils/ApiError.js";
+import { validateObjectId } from "../utils/validateObjectId.js";
 
 export const validateSubTask = async (subTaskId, userId) => {
-    if (!subTaskId) {
-        throw new ApiError(404, "SubTask Id not found...");
-    }
+    validateObjectId(subTaskId, "SubTask Id");
 
     const subTask = await SubTask.findById(subTaskId);
 

@@ -1,4 +1,5 @@
 import { SubTask } from "../model/subtask.model.js";
+import { Task } from "../model/task.model.js";
 
 import { validateTask } from "../helpers/task.helper.js";
 import { validateSubTask } from "../helpers/subTask.helper.js";
@@ -20,6 +21,11 @@ const createSubTask = asyncHandler(async (req, res) => {
     title,
     task: task.id,
   });
+
+  if (task.completed) {
+    task.completed = false;
+    await task.save();
+  }
 
   return res
     .status(200)
@@ -104,6 +110,11 @@ const deleteSubTask = asyncHandler(async (req, res) => {
   const subTask = await validateSubTask(req.params.subTaskId, req.user._id);
 
   const deletedSubTask = await SubTask.findByIdAndDelete(subTask._id);
+  const remainingSubTasks = await SubTask.find({ task: subTask.task });
+  const allCompleted =
+    remainingSubTasks.length > 0 && remainingSubTasks.every((item) => item.completed);
+
+  await Task.findByIdAndUpdate(subTask.task, { $set: { completed: allCompleted } });
 
   return res
     .status(200)
@@ -124,6 +135,10 @@ const toggleSubTaskStatus = asyncHandler(async (req, res) => {
 
   subTask.completed = !subTask.completed;
   await subTask.save();
+
+  const subTasks = await SubTask.find({ task: subTask.task });
+  const allCompleted = subTasks.length > 0 && subTasks.every((item) => item.completed);
+  await Task.findByIdAndUpdate(subTask.task, { $set: { completed: allCompleted } });
 
   return res
     .status(200)

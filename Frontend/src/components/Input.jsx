@@ -1,4 +1,5 @@
-import React from 'react';
+
+import { useId } from 'react';
 
 export function Input({
   label,
@@ -10,7 +11,8 @@ export function Input({
   rows = 3, // for type="textarea"
   ...props
 }) {
-  const inputId = id || `input_${Math.random().toString(36).substr(2, 9)}`;
+  const generatedId = useId();
+  const inputId = id || `input_${generatedId}`;
   const baseInputStyles = 'w-full px-3 py-2 border rounded-lg shadow-sm text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-0 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100';
   
   const stateStyles = error

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -25,6 +25,7 @@ export default function ProjectDetails() {
   const { 
     projects, 
     isLoading,
+    fetchProjectById,
     createTask, 
     updateTask, 
     deleteTask, 
@@ -43,9 +44,29 @@ export default function ProjectDetails() {
   // Modal States
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
+  const [isProjectLoading, setIsProjectLoading] = useState(false);
 
   // Find corresponding project
   const project = projects.find(p => p.id === projectId);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadProject = async () => {
+      setIsProjectLoading(true);
+      await fetchProjectById(projectId, false);
+      if (isMounted) {
+        setIsProjectLoading(false);
+      }
+    };
+
+    loadProject();
+
+    return () => {
+      isMounted = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectId]);
 
   // Formik form setup with Yup validation schema
   const formik = useFormik({
@@ -86,7 +107,7 @@ export default function ProjectDetails() {
     },
   });
 
-  if (isLoading) {
+  if (isLoading || isProjectLoading) {
     return (
       <div className="space-y-6">
         <div>
